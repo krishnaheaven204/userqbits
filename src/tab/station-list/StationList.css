@@ -2,3 +2,108 @@
   width: 100%;
 }
 
+.station-list-page .ul-card-allusers {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.station-list-page .status-box-container {
+  margin-bottom: 14px;
+}
+
+.station-list-page .table-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0;
+  max-height: 70vh;
+}
+
+.station-list-page .table-inner-force-allusers {
+  width: max-content;
+  min-width: 100%;
+}
+
+.station-list-page .custom-table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+}
+
+.station-list-page .custom-table thead th {
+  background: #f9fbfd;
+  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  color: #0f172a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.station-list-page .custom-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eaeef2;
+  border-right: 1px solid #eaeef2;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.station-list-page .custom-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.station-list-page .custom-table th:last-child,
+.station-list-page .custom-table td:last-child {
+  border-right: none;
+}
+
+.station-list-page .sortable-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.station-list-page .sortable-header:hover {
+  color: #159f6c;
+}
+
+.station-list-page .sort-arrows {
+  display: none;
+}
+
+.station-list-page .sticky-col {
+  background: #ffffff;
+}
+
+.station-list-page .col-actions {
+  text-align: center;
+  width: 80px;
+}
+
+.station-list-page .eye-btn {
+  border: 1px solid #d7dce3;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.station-list-page .eye-btn:hover {
+  border-color: #159f6c;
+  box-shadow: 0 2px 8px rgba(21, 159, 108, 0.15);
+}
+

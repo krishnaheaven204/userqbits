@@ -11,7 +11,15 @@ export default function Header() {
   const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
   const [pageTitle, setPageTitle] = useState('Dashboard');
-  const userIdentifier = getCurrentUser() || 'User';
+  const [userIdentifier, setUserIdentifier] = useState('');
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const name = getCurrentUser() || 'User';
+    setUserIdentifier(name);
+    setHydrated(true);
+  }, []);
+
   const userInitials = (userIdentifier?.trim?.()[0] || 'U').toUpperCase();
 
   useEffect(() => {
@@ -64,10 +72,10 @@ export default function Header() {
                   onClick={(e) => { e.preventDefault(); setShowProfile(!showProfile); }}
                 >
                   <div className="user-avtar">
-                    {userInitials}
+                    {hydrated ? userInitials : ''}
                   </div>
                   <span className="ms-2">
-                    <span className="user-name">{userIdentifier}</span>
+                    <span className="user-name">{hydrated ? userIdentifier : ''}</span>
                     <span className="user-desc">User</span>
                   </span>
                 </a>
