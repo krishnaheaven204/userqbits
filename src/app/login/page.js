@@ -1,5 +1,5 @@
-import Login from '@/pages/login/Login';
+import AuthLanding from '@/pages/auth/AuthLanding';
 
 export default function LoginPage() {
-  return <Login />;
+  return <AuthLanding />;
 }

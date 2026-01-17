@@ -103,8 +103,8 @@ export default function Login() {
 
         <div className="login-card">
           <div className="login-title">
-            <h1>Super Admin Login</h1>
-            <p>Sign in to access the Qbits Energy Dashboard</p>
+            <h1>Login</h1>
+            <p>Sign in to access your Qbits Portal</p>
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
@@ -161,7 +161,7 @@ export default function Login() {
           </form>
 
           <div className="login-footer">
-            <p className="text-muted small">Super Admin Access Only</p>
+            <p className="text-muted small">Welcome back</p>
           </div>
         </div>
       </div>

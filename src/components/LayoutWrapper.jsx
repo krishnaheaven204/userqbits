@@ -8,7 +8,11 @@ import Sidebar from '@/components/sidebar/Sidebar';
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/register' || pathname === '/login' || pathname === '/auth/login' || pathname === '/auth/register';
+  const isAuthPage =
+    pathname === '/login' ||
+    pathname === '/auth/login' ||
+    pathname === '/auth/register' ||
+    pathname?.startsWith('/register');
 
   useEffect(() => {
     import('bootstrap/dist/js/bootstrap.bundle.min.js');

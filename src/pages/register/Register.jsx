@@ -19,10 +19,10 @@ function generateCompanyCode() {
   return code + "T";
 }
 
-export default function Register() {
+export default function Register({ initialType = "company" }) {
   const router = useRouter();
 
-  const [registrationType, setRegistrationType] = useState("company");
+  const [registrationType, setRegistrationType] = useState(initialType);
   const [isLoading, setIsLoading] = useState(false);
   const [otpStage, setOtpStage] = useState(false);
   const [emailCode, setEmailCode] = useState("");

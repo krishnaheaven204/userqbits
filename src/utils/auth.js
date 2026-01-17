@@ -3,6 +3,10 @@
  * API-based Authentication (Laravel backend)
  */
 import { api } from './api';
+
+// Client auth endpoints
+export const CLIENT_LOGIN_ENDPOINT = 'https://qbits.quickestimate.co/api/v1/client/login';
+export const CLIENT_LOGOUT_ENDPOINT = 'https://qbits.quickestimate.co/api/v1/client/logout';
 export const AUTH_TOKEN_KEY = 'authToken';
 export const USER_EMAIL_KEY = 'userEmail';
 export const USER_ROLE_KEY = 'userRole';
@@ -122,6 +126,27 @@ export const logout = () => {
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
   sessionStorage.removeItem(USER_EMAIL_KEY);
   sessionStorage.removeItem(USER_ROLE_KEY);
+};
+
+// Call client logout API then clear stored auth; clears even if API fails so UI doesn't block logout
+export const logoutViaApi = async () => {
+  try {
+    await fetch(CLIENT_LOGOUT_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...(typeof window !== 'undefined' && getAuthToken()
+          ? { Authorization: `Bearer ${getAuthToken()}` }
+          : {})
+      },
+      body: JSON.stringify({})
+    });
+  } catch (err) {
+    // swallow; we still clear local storage below
+  } finally {
+    logout();
+  }
 };
 
 /**

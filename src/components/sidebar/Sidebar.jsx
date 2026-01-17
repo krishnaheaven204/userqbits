@@ -57,7 +57,7 @@ export default function Sidebar() {
         </div>
         <div className="navbar-content">
           <ul className="pc-navbar">
-            {/* Dashboard */}
+            {/* Dashboard (hidden for now)
             <li className="pc-item">
               <Link href="/dashboard" className={`pc-link qbits-nav-item ${isActive('dashboard') ? 'active' : ''}`}>
                 <span className="pc-micon">
@@ -66,6 +66,7 @@ export default function Sidebar() {
                 <span className="pc-mtext">Dashboard</span>
               </Link>
             </li>
+            */}
 
             {/* Station List */}
             <li className="pc-item">
@@ -87,7 +88,7 @@ export default function Sidebar() {
               </Link>
             </li>
 
-            {/* Create Station */}
+            {/* Create Station (hidden for now)
             <li className="pc-item">
               <Link href="/create-station" className={`pc-link qbits-nav-item ${isActive('create-station') ? 'active' : ''}`}>
                 <span className="pc-micon">
@@ -96,6 +97,7 @@ export default function Sidebar() {
                 <span className="pc-mtext">Create Station</span>
               </Link>
             </li>
+            */}
 
             {/* Device Library */}
             {/*
@@ -130,36 +132,32 @@ export default function Sidebar() {
             </li>
             */}
 
-            {/* User List */}
-            <li className={`pc-item pc-hasmenu ${expandedMenus.userList || isMenuActive(['user-list/all-users', 'user-list/admins', 'user-list/operators']) ? 'active' : ''}`}>
-              <a
-                href="#!"
-                className="pc-link qbits-nav-item"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleMenu('userList');
-                }}
-              >
-                <span className="pc-micon">
-                  <UserGroupIcon style={{width: '20px', height: '20px'}} />
-                </span>
-                <span className="pc-mtext">User List</span>
-                <span className="pc-arrow">
-                  <ChevronRightIcon style={{width: '16px', height: '16px'}} />
-                </span>
-              </a>
-              <ul className="pc-submenu" style={{maxHeight: expandedMenus.userList || isMenuActive(['user-list/all-users', 'user-list/admins', 'user-list/operators']) ? '500px' : '0'}}>
-                <li className="pc-item">
-                  <Link href="/user-list/all-users" className={`pc-link ${isActive('user-list/all-users') || pathname === '/user-list/all-users' ? 'active' : ''}`}>Stations</Link>
-                </li>
-                <li className="pc-item">
-                  <Link href="/user-list/admins" className={`pc-link ${isActive('user-list/admins') || pathname === '/user-list/admins' ? 'active' : ''}`}>Company</Link>
-                </li>
-                <li className="pc-item">
-                  <Link href="/user-list/operators" className={`pc-link ${isActive('user-list/operators') || pathname === '/user-list/operators' ? 'active' : ''}`}>Inverters</Link>
-                </li>
-              </ul>
-            </li>
+            {/* User List (hidden for now) */}
+            {false && (
+              <li className={`pc-item pc-hasmenu ${expandedMenus.userList || isMenuActive(['user-list/all-users', 'user-list/admins', 'user-list/operators']) ? 'active' : ''}`}>
+                <a
+                  href="#!"
+                  className="pc-link qbits-nav-item"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleMenu('userList');
+                  }}
+                >
+                  <span className="pc-micon">
+                    <UserGroupIcon style={{width: '20px', height: '20px'}} />
+                  </span>
+                  <span className="pc-mtext">User List</span>
+                  <span className="pc-arrow">
+                    <ChevronRightIcon style={{width: '16px', height: '16px'}} />
+                  </span>
+                </a>
+                <ul className="pc-submenu" style={{maxHeight: expandedMenus.userList || isMenuActive(['user-list/all-users', 'user-list/admins', 'user-list/operators']) ? '500px' : '0'}}>
+                  <li className="pc-item">
+                    <Link href="/user-list/all-users" className={`pc-link ${isActive('user-list/all-users') || pathname === '/user-list/all-users' ? 'active' : ''}`}>Stations</Link>
+                  </li>
+                </ul>
+              </li>
+            )}
 
             {/* Data Excel */}
             {/*
