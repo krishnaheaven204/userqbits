@@ -586,7 +586,7 @@ export default function PlantDetails() {
         }
 
         const statusParam = activeTab === "all" ? -1 : (activeTab === "going" ? 0 : 1);
-        const url = `https://qbits.quickestimate.co/api/v1/faults?plant_id=${plantNo}&inverter_id=&status=${statusParam}`;
+        const url = `https://qbits.quickestimate.co/api/v1/frontend/faults?plant_id=${plantNo}&inverter_id=&status=${statusParam}&limit=20`;
 
         const response = await fetch(url, {
           method: "GET",

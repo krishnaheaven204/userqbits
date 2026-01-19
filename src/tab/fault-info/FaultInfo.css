@@ -1,4 +1,170 @@
 .fault-info-page {
   width: 100%;
+  padding: 12px;
+}
+
+.fi-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  background: #ffffff;
+  padding: 16px;
+}
+
+.fi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.fi-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.fi-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.fi-tab {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fi-tab.active {
+  border-color: #159f6c;
+  color: #159f6c;
+  background: #e7f7f1;
+  font-weight: 600;
+}
+
+.fi-tab.export {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.fi-table-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.fi-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fi-table thead th {
+  background: #f9fbfd;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.fi-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eaeef2;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.fi-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.fi-center {
+  text-align: center;
+  padding: 32px 12px;
+}
+
+.fi-center.muted {
+  color: #9ca3af;
+}
+
+.fi-center.error {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.recovered {
+  background: #e7f7f1;
+  color: #159f6c;
+}
+
+.status.going {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.status.fault {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.status.unknown {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.fi-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 0 4px;
+}
+
+.fi-page-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fi-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fi-page-btn:not(:disabled):hover {
+  border-color: #159f6c;
+  color: #159f6c;
+  box-shadow: 0 2px 8px rgba(21, 159, 108, 0.12);
+}
+
+.fi-page-indicator {
+  font-size: 14px;
+  color: #4b5563;
+  min-width: 70px;
+  text-align: center;
+}
+.fault-info-page {
+  width: 100%;
 }
 
