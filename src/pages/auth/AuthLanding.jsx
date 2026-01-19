@@ -125,7 +125,12 @@ export default function AuthLanding() {
 
               <form onSubmit={handleLogin} className="d-grid gap-3">
                 <div className="text-start">
-                  <label className="form-label">Username</label>
+                  <label
+                    className="form-label"
+                    style={{ fontSize: "14px", fontWeight: 600 }}
+                  >
+                    Username
+                  </label>
                   <input
                     type="text"
                     name="username"
@@ -134,11 +139,17 @@ export default function AuthLanding() {
                     value={formData.username}
                     onChange={handleChange}
                     disabled={isLoading}
+                    style={{ fontSize: "14px", fontWeight: 400 }}
                   />
                 </div>
 
                 <div className="text-start">
-                  <label className="form-label">Password</label>
+                  <label
+                    className="form-label"
+                    style={{ fontSize: "14px", fontWeight: 600 }}
+                  >
+                    Password
+                  </label>
                   <div className="input-group">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -148,6 +159,7 @@ export default function AuthLanding() {
                       value={formData.password}
                       onChange={handleChange}
                       disabled={isLoading}
+                      style={{ fontSize: "14px", fontWeight: 400 }}
                     />
                     <button
                       type="button"
@@ -171,7 +183,10 @@ export default function AuthLanding() {
                   className="btn btn-lg text-white"
                   style={{
                     backgroundColor: loginHover ? '#1dbb7d' : '#159F6C',
-                    borderColor: loginHover ? '#1dbb7d' : '#159F6C'
+                    borderColor: loginHover ? '#1dbb7d' : '#159F6C',
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    lineHeight: "24px"
                   }}
                   onMouseEnter={() => setLoginHover(true)}
                   onMouseLeave={() => setLoginHover(false)}
@@ -185,7 +200,10 @@ export default function AuthLanding() {
                   style={{
                     color: '#159F6C',
                     backgroundColor: registerHover ? '#e6f7f0' : '#ffffff',
-                    borderColor: '#159F6C'
+                    borderColor: '#159F6C',
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    lineHeight: "24px"
                   }}
                   onMouseEnter={() => setRegisterHover(true)}
                   onMouseLeave={() => setRegisterHover(false)}

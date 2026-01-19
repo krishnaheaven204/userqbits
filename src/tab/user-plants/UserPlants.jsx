@@ -2,7 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { getAuthToken } from "@/utils/auth";
 import "./UserPlants.css";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const normalizeApiBase = (input) => {
+  if (!input) return "";
+  let base = input.trim();
+  const queryIndex = base.indexOf("?");
+  if (queryIndex !== -1) {
+    base = base.substring(0, queryIndex);
+  }
+  base = base.replace(/\/client\/index\/?$/i, "");
+  base = base.replace(/\/client\/?$/i, "");
+  base = base.replace(/\/$/, "");
+  return base;
+};
+
+const API_BASE_ROOT = normalizeApiBase(API_BASE_URL) || "https://qbits.quickestimate.co/api/v1";
 
 
 function renderStatusIcon(code) {
@@ -57,28 +75,26 @@ export default function UserPlants() {
 
   useEffect(() => {
     const fetchPlants = async () => {
+      setLoading(true);
+
       if (!id) {
-        setError("User ID not found");
+        setError("Missing user id for plant lookup");
+        setPlants([]);
         setLoading(false);
         return;
       }
 
-      setLoading(true);
-
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("authToken")
-          : null;
-
-      const apiUrl = `https://qbits.quickestimate.co/api/v1/plants/${id}?page=1&limit=20`;
+      const apiUrl = `${API_BASE_ROOT}/frontend/plants/${id}?page=1&limit=20`;
+      const token = getAuthToken();
+      const headers = {
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
 
       try {
         const response = await fetch(apiUrl, {
           method: "GET",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers,
         });
 
         if (!response.ok) {

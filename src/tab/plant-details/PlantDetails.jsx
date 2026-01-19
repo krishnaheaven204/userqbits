@@ -357,7 +357,7 @@ export default function PlantDetails() {
         // Try the show endpoint first
         try {
           response = await fetch(
-            `https://qbits.quickestimate.co/api/v1/plants/show/${plantNo}`,
+            `https://qbits.quickestimate.co/api/v1/frontend/plants/show/${plantNo}`,
             {
               method: "GET",
               headers,
@@ -644,7 +644,7 @@ export default function PlantDetails() {
           headers.Authorization = `Bearer ${token}`;
         }
 
-        const url = `https://qbits.quickestimate.co/api/v1/inverter/latest_data?plantId=${plantNo}`;
+        const url = `https://qbits.quickestimate.co/api/v1/frontend/inverter/latest_data?plantId=${plantNo}`;
 
         const response = await fetch(url, {
           method: "GET",

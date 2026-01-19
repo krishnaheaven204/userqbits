@@ -12,6 +12,48 @@
   margin-bottom: 14px;
 }
 
+.station-list-page .ul-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.station-list-page .ul-search {
+  margin-top: 4px;
+}
+
+.station-list-page .ul-search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  min-width: 260px;
+}
+
+.station-list-page .ul-search-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.station-list-page .ul-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.station-list-page .ul-input::placeholder {
+  color: #94a3b8;
+}
+
 .station-list-page .table-scroll-container {
   overflow-x: auto;
   overflow-y: hidden;
@@ -47,7 +89,7 @@
   padding: 10px 12px;
   border-bottom: 1px solid #eaeef2;
   border-right: 1px solid #eaeef2;
-  color: #0f172a;
+  color: #79808b;
   font-size: 14px;
 }
 
@@ -85,6 +127,27 @@
   background: #ffffff;
 }
 
+.station-list-page .col-index {
+  position: sticky;
+  left: 0;
+  min-width: 50px;
+  z-index: 4;
+}
+
+.station-list-page .col-id {
+  position: sticky;
+  left: 60px;
+  min-width: 80px;
+  z-index: 4;
+}
+
+.station-list-page .col-username {
+  position: sticky;
+  left: 140px;
+  min-width: 160px;
+  z-index: 4;
+}
+
 .station-list-page .col-actions {
   text-align: center;
   width: 80px;
@@ -105,5 +168,70 @@
 .station-list-page .eye-btn:hover {
   border-color: #159f6c;
   box-shadow: 0 2px 8px rgba(21, 159, 108, 0.15);
+}
+
+.station-pagination {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.station-pagination .pagination-arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.station-pagination .pagination-arrow-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.station-pagination .pagination-arrow-btn:not(:disabled):hover {
+  border-color: #159f6c;
+  color: #159f6c;
+  box-shadow: 0 2px 8px rgba(21, 159, 108, 0.12);
+}
+
+.station-pagination .pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.station-pagination .pagination-number {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.station-pagination .pagination-number.active {
+  background: #159f6c;
+  color: #ffffff;
+  border-color: #159f6c;
+}
+
+.station-pagination .pagination-number:hover:not(.active) {
+  border-color: #159f6c;
+  color: #159f6c;
+  box-shadow: 0 2px 8px rgba(21, 159, 108, 0.12);
+}
+
+.station-pagination .pagination-ellipsis {
+  color: #94a3b8;
+  padding: 0 4px;
 }
 

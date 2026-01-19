@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import './StationList.css';
 import '../user-list/all-users/AllUsers.css';
@@ -42,9 +43,13 @@ const SortableHeader = ({ label, field, sortConfig, onSort }) => {
 };
 
 export default function StationList() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('standby');
+  const [tablePage, setTablePage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [groupedClients, setGroupedClients] = useState({
     all_plant: [],
     normal_plant: [],
@@ -95,12 +100,6 @@ export default function StationList() {
         const cmp = ka.value.localeCompare(kb.value);
         return direction === 'asc' ? cmp : -cmp;
       }
-      if (field === 'password') {
-        const va = (a.password || '').toLowerCase();
-        const vb = (b.password || '').toLowerCase();
-        const cmp = va.localeCompare(vb);
-        return direction === 'asc' ? cmp : -cmp;
-      }
       if (field === 'company_code') {
         const va = (a.company_code || '').toLowerCase();
         const vb = (b.company_code || '').toLowerCase();
@@ -141,7 +140,7 @@ export default function StationList() {
         return;
       }
 
-      const encodedSearch = '';
+      const encodedSearch = encodeURIComponent(search.trim());
       const url = `${API_BASE_ROOT}/frontend/grouped-clients?search=${encodedSearch}&per_page=${ROWS_PER_PAGE}&page_all=1&page_normal=1&page_alarm=1&page_offline=1`;
 
       const response = await fetch(url, {
@@ -184,7 +183,19 @@ export default function StationList() {
 
   useEffect(() => {
     fetchGroupedClients();
-  }, []);
+  }, [search]);
+
+  // Debounce search input -> search value
+  useEffect(() => {
+    const normalizedInput = searchInput.trim();
+    const handler = setTimeout(() => {
+      if (normalizedInput === search) return;
+      setSearch(normalizedInput);
+      setTablePage(1);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchInput, search]);
 
   const tableData = useMemo(() => {
     if (selectedStatus === 'normal') return groupedClients.normal_plant;
@@ -193,13 +204,93 @@ export default function StationList() {
     return groupedClients.all_plant;
   }, [selectedStatus, groupedClients]);
 
-  const sortedData = useMemo(() => sortData(tableData), [tableData, sortConfig]);
+  const filteredData = useMemo(() => {
+    const term = searchInput.trim().toLowerCase();
+    if (!term) return tableData;
+    return tableData.filter((item) => {
+      const fields = [
+        item.username,
+        item.company_code || item.qbits_company_code,
+        item.phone,
+        item.email,
+        item.id,
+      ];
+      return fields.some((f) => String(f || '').toLowerCase().includes(term));
+    });
+  }, [tableData, searchInput]);
+
+  const sortedData = useMemo(() => sortData(filteredData), [filteredData, sortConfig]);
+
+  const totalTablePages = Math.max(1, Math.ceil(sortedData.length / ROWS_PER_PAGE));
+  const paginatedData = useMemo(() => {
+    const start = (tablePage - 1) * ROWS_PER_PAGE;
+    return sortedData.slice(start, start + ROWS_PER_PAGE);
+  }, [sortedData, tablePage]);
+
+  useEffect(() => {
+    setTablePage(1);
+  }, [selectedStatus, groupedClients]);
+
+  const handleTablePrevious = () => {
+    setTablePage((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleTableNext = () => {
+    setTablePage((prev) => Math.min(totalTablePages, prev + 1));
+  };
+
+  const getPageNumbers = (currentPage, totalPages) => {
+    const maxVisible = 5;
+    const pages = [];
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      if (currentPage <= 2) {
+        endPage = Math.min(totalPages - 1, 4);
+      }
+      if (currentPage >= totalPages - 1) {
+        startPage = Math.max(2, totalPages - 3);
+      }
+
+      if (startPage > 2) pages.push('...');
+      for (let i = startPage; i <= endPage; i++) pages.push(i);
+      if (endPage < totalPages - 1) pages.push('...');
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
+  const handleNavigateToPlants = (item) => {
+    if (!item?.id) return;
+    const username = item?.username ? `?username=${encodeURIComponent(item.username)}` : '';
+    router.push(`/user-plants/${item.id}${username}`);
+  };
 
   const formatDate = (value) => {
     if (!value) return 'N/A';
     const d = new Date(value);
     if (Number.isNaN(d.getTime())) return value;
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  const formatNumber = (value) => {
+    if (value === null || value === undefined || value === '') return 'N/A';
+    const num = Number(value);
+    if (Number.isFinite(num)) return num.toFixed(2);
+    return String(value);
+  };
+
+  const getPlantTypeLabel = (v) => {
+    if (v === 0) return 'Solar System';
+    if (v === 1) return 'Battery Storage';
+    if (v === 2) return 'Solar with Limitation';
+    return v ?? 'N/A';
   };
 
   const emptyState = !loading && sortedData.length === 0;
@@ -212,6 +303,28 @@ export default function StationList() {
             <h4 className="ul-title">Station List</h4>
             <p className="ul-subtitle">Monitor all plants by status</p>
           </div>
+          <form onSubmit={(e) => e.preventDefault()} className="ul-search">
+            <div className="ul-search-input">
+              <span className="ul-search-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85Zm-5.242.656a5 5 0 1 1 0-10.001 5 5 0 0 1 0 10Z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                className="ul-input"
+                placeholder="Search by username, company code, collector..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+          </form>
         </div>
 
         <div className="ul-body">
@@ -279,11 +392,11 @@ export default function StationList() {
                         <th className="sticky-col col-id">
                           <SortableHeader label="ID" field="id" sortConfig={sortConfig} onSort={handleSort} />
                         </th>
-                        <th className="sticky-col col-code">
-                          <SortableHeader label="Code" field="company_code" sortConfig={sortConfig} onSort={handleSort} />
-                        </th>
                         <th className="sticky-col col-username">
                           <SortableHeader label="Username" field="username" sortConfig={sortConfig} onSort={handleSort} />
+                        </th>
+                        <th>
+                          <SortableHeader label="Company Code" field="company_code" sortConfig={sortConfig} onSort={handleSort} />
                         </th>
                         <th>
                           <SortableHeader label="Phone" field="phone" sortConfig={sortConfig} onSort={handleSort} />
@@ -291,9 +404,17 @@ export default function StationList() {
                         <th>
                           <SortableHeader label="Email" field="email" sortConfig={sortConfig} onSort={handleSort} />
                         </th>
-                        <th>
-                          <SortableHeader label="Password" field="password" sortConfig={sortConfig} onSort={handleSort} />
-                        </th>
+                        <th>Inverter Type</th>
+                        <th>Plant Name</th>
+                        <th>City</th>
+                        <th>Collector</th>
+                        <th>Longitude</th>
+                        <th>Latitude</th>
+                        <th>GMT</th>
+                        <th>Plant Type</th>
+                        <th>Capacity (kW)</th>
+                        <th>Day Production</th>
+                        <th>Total Production</th>
                         <th>
                           <SortableHeader label="Created At" field="created_at" sortConfig={sortConfig} onSort={handleSort} />
                         </th>
@@ -303,15 +424,29 @@ export default function StationList() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedData.map((item, idx) => (
-                        <tr key={item.id ?? idx}>
-                          <td className="sticky-col col-index">{idx + 1}</td>
+                      {paginatedData.map((item, idx) => (
+                        <tr
+                          key={item.id ?? idx}
+                          onClick={() => handleNavigateToPlants(item)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <td className="sticky-col col-index">{(tablePage - 1) * ROWS_PER_PAGE + idx + 1}</td>
                           <td className="sticky-col col-id">{item.id ?? 'N/A'}</td>
-                          <td className="sticky-col col-code">{item.company_code || item.qbits_company_code || 'N/A'}</td>
                           <td className="sticky-col col-username">{item.username || 'N/A'}</td>
+                          <td>{item.company_code || item.qbits_company_code || 'N/A'}</td>
                           <td>{item.phone || 'N/A'}</td>
                           <td>{item.email || 'N/A'}</td>
-                          <td>{item.password || 'N/A'}</td>
+                          <td>{item.inverter_type || item.inverterType || 'N/A'}</td>
+                          <td>{item.plant_name || 'N/A'}</td>
+                          <td>{item.city || item.remark1 || 'N/A'}</td>
+                          <td>{item.collector || item.collector_sn || 'N/A'}</td>
+                          <td>{item.longitude || 'N/A'}</td>
+                          <td>{item.latitude || 'N/A'}</td>
+                          <td>{item.gmt || item.timezone || 'N/A'}</td>
+                          <td>{getPlantTypeLabel(item.plant_type)}</td>
+                          <td>{formatNumber(item.capacity)}</td>
+                          <td>{formatNumber(item.day_production || item.eday)}</td>
+                          <td>{formatNumber(item.total_production || item.etot)}</td>
                           <td>{formatDate(item.created_at)}</td>
                           <td>{formatDate(item.updated_at)}</td>
                         </tr>
@@ -321,6 +456,48 @@ export default function StationList() {
                 )}
               </div>
             </div>
+            {!emptyState && (
+              <div className="station-pagination">
+                <button
+                  type="button"
+                  className="pagination-arrow-btn"
+                  onClick={handleTablePrevious}
+                  disabled={tablePage === 1}
+                  aria-label="Previous page"
+                >
+                  ‹
+                </button>
+                <div className="pagination-numbers">
+                  {getPageNumbers(tablePage, totalTablePages).map((pageNum, idx) => (
+                    pageNum === '...'
+                      ? (
+                        <span key={`ellipsis-${idx}`} className="pagination-ellipsis">
+                          {pageNum}
+                        </span>
+                      )
+                      : (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          className={`pagination-number ${tablePage === pageNum ? 'active' : ''}`}
+                          onClick={() => setTablePage(pageNum)}
+                        >
+                          {pageNum}
+                        </button>
+                      )
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="pagination-arrow-btn"
+                  onClick={handleTableNext}
+                  disabled={tablePage === totalTablePages}
+                  aria-label="Next page"
+                >
+                  ›
+                </button>
+              </div>
+            )}
           </div>
         )}
         </div>

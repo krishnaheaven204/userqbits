@@ -17,7 +17,7 @@ export async function GET(request) {
       atpd: atpd || ''
     });
 
-    const apiUrl = `https://qbits.quickestimate.co/api/v1/plants/statistics-by-day/?${params}`;
+    const apiUrl = `https://qbits.quickestimate.co/api/v1/frontend/plants/statistics-by-day/?${params}`;
 
     const headers = {
       'Accept': 'application/json',
