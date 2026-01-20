@@ -7,8 +7,8 @@ const API_URL = 'https://qbits.quickestimate.co/api/v1/frontend/faults';
 const PAGE_SIZE = 20;
 
 const TAB_CONFIG = [
-  { key: 'all', label: 'ALL', status: -1 },
-  { key: 'going', label: 'Fault', status: 0 },
+  { key: 'all', label: 'All', status: -1 },
+  { key: 'going', label: 'Going', status: 0 },
   { key: 'recovered', label: 'Recovered', status: 1 }
 ];
 
@@ -211,9 +211,6 @@ export default function FaultInfo() {
                 {tab.label}
               </button>
             ))}
-            <button type="button" className="fi-tab export" disabled>
-              Fault Export ↓
-            </button>
           </div>
         </div>
 
