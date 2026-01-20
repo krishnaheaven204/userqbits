@@ -21,8 +21,9 @@ function formatDate(value) {
 
 function statusBadge(status) {
   if (status === 1 || status === 'Recovered') return { text: 'Recovered', className: 'status recovered' };
-  // Treat all non-1 statuses as Fault to align with API meaning
-  if (status === 0 || status === 'Fault' || status === 'Going' || status === -1 || status === 2) return { text: 'Fault', className: 'status fault' };
+  if (status === 2 || status === 'Unknown') return { text: 'Unknown', className: 'status unknown' };
+  // Treat all other non-1 statuses as Fault to align with API meaning
+  if (status === 0 || status === 'Fault' || status === 'Going' || status === -1) return { text: 'Fault', className: 'status fault' };
   return { text: String(status ?? 'Unknown'), className: 'status unknown' };
 }
 
