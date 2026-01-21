@@ -113,9 +113,16 @@ export default function AuthLanding() {
         data?.data?.token ||
         data?.data?.access_token;
 
-      const clientPayload = data?.client || data?.data?.client;
-      const roleFromClient = clientPayload?.user_flag ? 'client' : 'user';
-      const role = data?.role || data?.data?.role || roleFromClient || 'client';
+      const clientPayload = data?.client || data?.data?.client || data?.user || data?.data?.user;
+      const rawUserFlag =
+        clientPayload?.user_flag ??
+        data?.user_flag ??
+        data?.data?.user_flag ??
+        data?.user?.user_flag ??
+        data?.data?.user?.user_flag;
+      const userFlag = Number(rawUserFlag);
+      const roleLabel = userFlag === 1 ? 'Dealer' : 'User';
+      const role = data?.role || data?.data?.role || roleLabel;
 
       if (!token) {
         setError('Login failed: no token returned.');

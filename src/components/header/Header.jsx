@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bars3Icon, UserCircleIcon, Cog6ToothIcon, PowerIcon } from '@heroicons/react/24/outline';
-import { logoutViaApi, getCurrentUser } from '@/utils/auth';
+import { logoutViaApi, getCurrentUser, getUserRole } from '@/utils/auth';
 import './Header.css';
 
 export default function Header() {
@@ -12,11 +12,14 @@ export default function Header() {
   const [showProfile, setShowProfile] = useState(false);
   const [pageTitle, setPageTitle] = useState('Dashboard');
   const [userIdentifier, setUserIdentifier] = useState('');
+  const [userRole, setUserRole] = useState('User');
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const name = getCurrentUser() || 'User';
+    const role = getUserRole() || 'User';
     setUserIdentifier(name);
+    setUserRole(role);
     setHydrated(true);
   }, []);
 
@@ -76,7 +79,7 @@ export default function Header() {
                   </div>
                   <span className="ms-2">
                     <span className="user-name">{hydrated ? userIdentifier : ''}</span>
-                    <span className="user-desc">User</span>
+                    <span className="user-desc">{hydrated ? userRole : ''}</span>
                   </span>
                 </a>
                 {showProfile && (
@@ -90,7 +93,7 @@ export default function Header() {
                         </div>
                         <div className="profile-user-details">
                           <h5 className="profile-user-name">{userIdentifier}</h5>
-                          <span className="profile-user-email">User</span>
+                          <span className="profile-user-email">{userRole}</span>
                         </div>
                       </div>
                       <div className="profile-actions">

@@ -136,6 +136,7 @@ function ProductionSummary({ stats, percentage = 25 }) {
 
 export default function InverterSummary({ inverterId, plantNo }) {
   const router = useRouter();
+  const resolvedPlantNo = plantNo || 1787;
   const [activeTab, setActiveTab] = useState('all');
   const [alarms, setAlarms] = useState([]);
   const [loadingAlarms, setLoadingAlarms] = useState(false);
@@ -206,39 +207,16 @@ export default function InverterSummary({ inverterId, plantNo }) {
   const [basicInfoData, setBasicInfoData] = useState(null);
   const [loadingBasicInfo, setLoadingBasicInfo] = useState(false);
 
-  const basicInfo = useMemo(() => {
-    const inv = basicInfoData || {};
-    const toDisplay = (value) => (value === null || value === undefined || value === '' ? '—' : value);
-    return [
-      { label: 'Device', value: toDisplay(inv.model) },
-      { label: 'No.', value: toDisplay(inv.id ?? inverterId) },
-      { label: 'RS485 ID', value: toDisplay(inv.inverter_no) },
-      { label: 'Collector', value: toDisplay(inv.collector_address) },
-      { label: 'Record Time', value: toDisplay(inv.record_time) },
-      { label: 'Serial', value: toDisplay(inv.collector_address) },
-      { label: 'Time-zone', value: toDisplay(inv.timezone) },
-      { label: 'Panel', value: toDisplay(inv.panel) },
-      { label: 'Panel Qty.', value: toDisplay(inv.panel_num) },
-    ];
-  }, [basicInfoData, inverterId]);
+  const toNumberOrNull = (value) => {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  };
 
-  const prodStats = useMemo(
-    () => [
-      { label: 'Keep-live power', value: '1.4 kW' },
-      { label: 'Capacity', value: '5.6 kWp' },
-      { label: 'Day Production', value: '1.17 kWh' },
-      { label: 'Total Production', value: '2137 kWh' },
-      { label: 'kpi', value: '0.2' },
-      { label: 'Work Time', value: '2:8:0' },
-    ],
-    []
-  );
-
-  const breadcrumbs = [
-    { label: 'Back', action: () => router.back() },
-    { label: 'Inverter' },
-    { label: new Date().toLocaleString() },
-  ];
+  const formatMetric = (value, suffix = '') => {
+    const num = toNumberOrNull(value);
+    if (num === null) return '—';
+    return suffix ? `${num} ${suffix}` : `${num}`;
+  };
 
   const formatValue = (value, suffix = '') => {
     if (value === null || value === undefined || value === '') return '—';
@@ -255,6 +233,61 @@ export default function InverterSummary({ inverterId, plantNo }) {
     }
     return '—';
   };
+
+  const basicInfo = useMemo(() => {
+    const inv = basicInfoData || {};
+    return [
+      { label: 'Device', value: formatValue(inv.model) },
+      { label: 'No.', value: formatValue(inv.id ?? inverterId) },
+      { label: 'RS485 ID', value: formatValue(inv.inverter_no) },
+      { label: 'Collector', value: formatValue(inv.collector_address) },
+      { label: 'Record Time', value: formatValue(inv.record_time) },
+      { label: 'Serial', value: formatValue(inv.collector_address) },
+      { label: 'Time-zone', value: formatValue(inv.timezone) },
+      { label: 'Panel', value: formatValue(inv.panel) },
+      { label: 'Panel Qty.', value: formatValue(inv.panel_num) },
+    ];
+  }, [basicInfoData, inverterId]);
+
+  const prodStats = useMemo(() => {
+    const inv = basicInfoData || {};
+
+    const keepLivePower = toNumberOrNull(inv.dcCurrent ?? inv.dc_current);
+    const capacity = toNumberOrNull(inv.capacity ?? inv.capacityLower ?? inv.capacity_upper);
+    const dayProduction = toNumberOrNull(inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power);
+    const totalProduction = toNumberOrNull(inv.totalPowerLower ?? inv.total_power_lower ?? inv.totalPower ?? inv.total_power);
+    const kpi = toNumberOrNull(inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.kpi);
+    const workTime = inv.workTime || inv.work_time;
+
+    return [
+      { label: 'Keep-live power', value: formatMetric(keepLivePower, 'kW') },
+      { label: 'Capacity', value: formatMetric(capacity, 'kWp') },
+      { label: 'Day Production', value: formatMetric(dayProduction, 'kWh') },
+      { label: 'Total Production', value: formatMetric(totalProduction, 'kWh') },
+      { label: 'kpi', value: formatMetric(kpi) },
+      { label: 'Work Time', value: workTime || '—' },
+    ];
+  }, [basicInfoData]);
+
+  const wavePercent = useMemo(() => {
+    const inv = basicInfoData || {};
+    const kpi = toNumberOrNull(inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.kpi);
+    const dayProduction = toNumberOrNull(inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power);
+    const totalProduction = toNumberOrNull(inv.totalPowerLower ?? inv.total_power_lower ?? inv.totalPower ?? inv.total_power);
+
+    if (kpi !== null) return Math.max(0, Math.min(100, Math.round(kpi * 100)));
+    if (totalProduction && dayProduction !== null) {
+      const pct = (dayProduction / totalProduction) * 100;
+      return Math.max(0, Math.min(100, Math.round(pct)));
+    }
+    return 25;
+  }, [basicInfoData]);
+
+  const breadcrumbs = [
+    { label: 'Back', action: () => router.back() },
+    { label: 'Inverter' },
+    { label: new Date().toLocaleString() },
+  ];
 
   const acRows = useMemo(() => {
     const inv = basicInfoData || {};
@@ -369,7 +402,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
         if (token) headers.Authorization = `Bearer ${token}`;
 
         const statusParam = activeTab === 'all' ? -1 : activeTab === 'going' ? 0 : 1;
-        const url = `https://qbits.quickestimate.co/api/v1/faults?plant_id=${plantNo ?? ''}&inverter_id=${inverterId ?? ''}&status=${statusParam}`;
+        const url = `https://qbits.quickestimate.co/api/v1/faults?plant_id=${resolvedPlantNo ?? ''}&inverter_id=${inverterId ?? ''}&status=${statusParam}`;
 
         const response = await fetch(url, { method: 'GET', headers, signal: abortController.signal });
         if (response.ok) {
@@ -393,7 +426,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
     fetchAlarms();
     return () => abortController.abort();
-  }, [plantNo, inverterId, activeTab]);
+  }, [resolvedPlantNo, inverterId, activeTab]);
 
   useEffect(() => {
     setAlarmCurrentPage(1);
@@ -401,7 +434,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
   // Fetch basic info from latest inverter data
   useEffect(() => {
-    if (!plantNo) {
+    if (!resolvedPlantNo) {
       setBasicInfoData(null);
       return;
     }
@@ -416,7 +449,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
         const headers = { Accept: 'application/json' };
         if (token) headers.Authorization = `Bearer ${token}`;
 
-        const url = `https://qbits.quickestimate.co/api/v1/frontend/inverter/latest_data?plantId=${plantNo}`;
+        const url = `https://qbits.quickestimate.co/api/v1/frontend/inverter/latest_data?plantId=${resolvedPlantNo}`;
         const response = await fetch(url, { method: 'GET', headers, signal: abortController.signal });
         if (response.ok) {
           const data = await response.json();
@@ -479,7 +512,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
     fetchBasicInfo();
     return () => abortController.abort();
-  }, [plantNo, inverterId]);
+  }, [resolvedPlantNo, inverterId]);
 
   const getPaginatedAlarms = () => {
     const startIndex = (alarmCurrentPage - 1) * alarmsPerPage;
@@ -679,7 +712,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
       <div className="summary-layout">
         <BasicInfo items={basicInfo} loading={loadingBasicInfo} />
-        <ProductionSummary stats={prodStats} percentage={25} />
+        <ProductionSummary stats={prodStats} percentage={wavePercent} />
       </div>
 
       <div className="lower-layout">
