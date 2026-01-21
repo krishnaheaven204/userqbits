@@ -141,7 +141,14 @@ export default function InverterTab() {
     }
 
     return sortedInverters.map((inv, idx) => {
-      const badge = getStateBadge(inv?.state ?? inv?.status ?? inv?.state_text ?? inv?.status_text);
+      const badge = getStateBadge(
+        inv?.plantstate ??
+        inv?.plant?.plantstate ??
+        inv?.state ??
+        inv?.status ??
+        inv?.state_text ??
+        inv?.status_text
+      );
       const plantName = inv?.plant_name || inv?.plant?.plant_name || 'N/A';
       const collector = inv?.collector_address || inv?.collector || inv?.collector_sn || 'N/A';
       const model = inv?.model || inv?.inverter_model || inv?.type || 'N/A';
