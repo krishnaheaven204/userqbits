@@ -88,6 +88,16 @@ export default function Sidebar() {
               </Link>
             </li>
 
+            {/* Inverter */}
+            <li className="pc-item">
+              <Link href="/user-list/operators" className={`pc-link qbits-nav-item ${isActive('user-list/operators') ? 'active' : ''}`}>
+                <span className="pc-micon">
+                  <CpuChipIcon style={{width: '20px', height: '20px'}} />
+                </span>
+                <span className="pc-mtext">Inverter</span>
+              </Link>
+            </li>
+
             {/* Create Station (hidden for now)
             <li className="pc-item">
               <Link href="/create-station" className={`pc-link qbits-nav-item ${isActive('create-station') ? 'active' : ''}`}>
