@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import './Operators.css';
 
 const API_URL = 'https://qbits.quickestimate.co/api/v1/frontend/inverter/all_latest_data';
@@ -52,9 +53,45 @@ const getStateBadge = (state) => {
 };
 
 export default function InverterTab() {
+  const router = useRouter();
   const [inverters, setInverters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const handleOpenInverter = (inv) => {
+    if (!inv) return;
+    const plantNo =
+      inv?.plant_no ??
+      inv?.plantNo ??
+      inv?.plant_id ??
+      inv?.plantId ??
+      inv?.plant?.plant_no ??
+      inv?.plant?.plantId ??
+      inv?.plant?.plant_id ??
+      null;
+
+    const targetId =
+      inv?.id ??
+      inv?.inverter_id ??
+      inv?.inverterId ??
+      inv?.inverter_no ??
+      inv?.inverterNo ??
+      inv?.sn ??
+      inv?.inverter_sn ??
+      inv?.inverter?.id ??
+      inv?.inverter?.inverter_id ??
+      inv?.inverter?.inverter_no;
+    if (!targetId) return;
+
+    const query = plantNo ? `?plant_no=${plantNo}` : '';
+    const path = `/inverters/${targetId}/summary${query}`;
+
+    if (router && typeof router.push === 'function') {
+      router.push(path);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = path;
+    }
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -153,8 +190,20 @@ export default function InverterTab() {
       const collector = inv?.collector_address || inv?.collector || inv?.collector_sn || 'N/A';
       const model = inv?.model || inv?.inverter_model || inv?.type || 'N/A';
       const recordTime = inv?.record_time || inv?.recordTime || inv?.time;
+      const rowId =
+        inv?.id ??
+        inv?.inverter_id ??
+        inv?.inverterId ??
+        inv?.inverter_no ??
+        inv?.inverterNo ??
+        inv?.sn ??
+        inv?.inverter_sn ??
+        inv?.inverter?.id ??
+        inv?.inverter?.inverter_id ??
+        inv?.inverter?.inverter_no ??
+        idx;
       return (
-        <tr key={inv?.id ?? idx}>
+        <tr key={rowId} onClick={() => handleOpenInverter(inv)} style={{ cursor: 'pointer' }}>
           <td>{formatText(plantName)}</td>
           <td>{formatText(inv?.id)}</td>
           <td>{formatText(collector)}</td>

@@ -827,56 +827,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
         </div>
       </div>
 
-      <div className="card chart-card compact">
-        <div className="chart-head">
-          <div className="chart-title">String information (current / A)</div>
-          <div className="chart-controls">
-            <div className="metric-dropdown" ref={metricDropdownRef}>
-              <button
-                type="button"
-                className="metric-trigger"
-                onClick={() => setIsMetricMenuOpen((s) => !s)}
-              >
-                Metrics ({selectedMetrics.length})
-                <span className="chevron">{isMetricMenuOpen ? '▲' : '▼'}</span>
-              </button>
-              {isMetricMenuOpen && (
-                <div className="metric-menu">
-                  {metricOptions.map((metric) => (
-                    <label key={metric} className="metric-option">
-                      <input
-                        type="checkbox"
-                        checked={selectedMetrics.includes(metric)}
-                        onChange={() => toggleMetric(metric)}
-                      />
-                      <span>{metric}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="chart-tabs">
-              {['day', 'month', 'year', 'total'].map((tab) => (
-                <button
-                  key={tab}
-                  className={`chart-tab ${chartTab === tab ? 'active' : ''}`}
-                  onClick={() => setChartTab(tab)}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </div>
-            <div className="chart-date">{new Date().toISOString().slice(0, 10)}</div>
-          </div>
-        </div>
-        <div className="chart-body">
-          {chartTab === 'day' ? (
-            <Line data={chartData} options={chartOptions} plugins={[hoverLinePlugin]} />
-          ) : (
-            <Bar data={chartData} options={chartOptions} plugins={[hoverLinePlugin]} />
-          )}
-        </div>
-      </div>
+      {/* Chart card removed per request */}
     </div>
   );
 }
