@@ -82,8 +82,8 @@
 
 .summary-layout {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 12px;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
 }
 
 .info-card,
@@ -232,8 +232,14 @@
 
 .prod-tile-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+}
+
+@media (max-width: 960px) {
+  .prod-tile-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
 }
 
 .tile {
