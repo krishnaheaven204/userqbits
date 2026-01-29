@@ -34,6 +34,12 @@ const formatText = (value) => {
   return String(value);
 };
 
+const formatNumber = (value, digits = 2) => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return 'N/A';
+  return num.toFixed(digits);
+};
+
 const getStateBadge = (state) => {
   const raw = state ?? 'Unknown';
   const normalized = String(raw).toLowerCase();
@@ -264,10 +270,14 @@ export default function InverterTab() {
         inv?.state_text ??
         inv?.status_text
       );
-      const plantName = inv?.plant_name || inv?.plant?.plant_name || 'N/A';
-      const collector = inv?.collector_address || inv?.collector || inv?.collector_sn || 'N/A';
+      const keepLivePower = formatNumber(inv?.acMomentaryPower ?? inv?.ac_power ?? inv?.acPower);
+      const dayProduction = formatNumber(inv?.dayPowerLower ?? inv?.day_power ?? inv?.dayPower);
+      const totalProduction = formatNumber(inv?.totalPowerLower ?? inv?.total_power ?? inv?.totalPower);
+      const dataTime = inv?.data_time || inv?.dataTime || inv?.time;
+      const recordTime = inv?.record_time || inv?.recordTime || inv?.updated_at || inv?.created_at;
       const model = inv?.model || inv?.inverter_model || inv?.type || 'N/A';
-      const recordTime = inv?.record_time || inv?.recordTime || inv?.time;
+      const serial = inv?.inverter_sn || inv?.sn || inv?.serial || inv?.collector_sn || 'N/A';
+      const collector = inv?.collector_address || inv?.collector || inv?.collector_sn || 'N/A';
       const rowId =
         inv?.id ??
         inv?.inverter_id ??
@@ -282,14 +292,15 @@ export default function InverterTab() {
         idx;
       return (
         <tr key={rowId} onClick={() => handleOpenInverter(inv)} style={{ cursor: 'pointer' }}>
-          <td>{formatText(plantName)}</td>
-          <td>{formatText(inv?.id)}</td>
-          <td>{formatText(collector)}</td>
-          <td>{formatText(model)}</td>
-          <td>{formatDateTime(recordTime)}</td>
-          <td>{formatDateTime(inv?.created_at)}</td>
-          <td>{formatDateTime(inv?.updated_at)}</td>
           <td><span className={badge.className}>{badge.text}</span></td>
+          <td>{keepLivePower}</td>
+          <td>{dayProduction}</td>
+          <td>{totalProduction}</td>
+          <td>{formatDateTime(dataTime)}</td>
+          <td>{formatDateTime(recordTime)}</td>
+          <td>{formatText(model)}</td>
+          <td>{formatText(serial)}</td>
+          <td>{formatText(collector)}</td>
         </tr>
       );
     });
@@ -314,14 +325,15 @@ export default function InverterTab() {
           <table className="inv-table">
             <thead>
               <tr>
-                <th>Plant Name</th>
-                <th>ID</th>
-                <th>Collector Address</th>
-                <th>Model</th>
-                <th>Record Time</th>
-                <th>Created At</th>
-                <th>Updated At</th>
                 <th>Status</th>
+                <th>Keep-live power (kW)</th>
+                <th>Day Production (kWh)</th>
+                <th>Total Production (kWh)</th>
+                <th>Data Time</th>
+                <th>Record Time</th>
+                <th>Model</th>
+                <th>Serial</th>
+                <th>Collector</th>
               </tr>
             </thead>
             <tbody>{renderBody()}</tbody>

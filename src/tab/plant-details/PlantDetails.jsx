@@ -8,8 +8,16 @@ import "./PlantDetails.css";
 // Helper functions
 const safeNumber = (value) => {
   if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === "string") {
+    const cleaned = value.replace(/[^0-9+\-\.eE]/g, "");
+    const num = parseFloat(cleaned);
+    return Number.isFinite(num) ? num : null;
+  }
   const num = Number(value);
-  return isNaN(num) ? null : num;
+  return Number.isFinite(num) ? num : null;
 };
 
 const formatValue = (value, decimals = 2) => {
@@ -17,6 +25,13 @@ const formatValue = (value, decimals = 2) => {
   const num = safeNumber(value);
   if (num === null) return "--";
   return num.toFixed(decimals);
+};
+
+const formatNumberOrText = (value, decimals = 2) => {
+  const num = safeNumber(value);
+  if (num !== null) return num.toFixed(decimals);
+  if (value === null || value === undefined || value === "") return "--";
+  return String(value);
 };
 
 const mapPlantState = (state) => {
@@ -30,6 +45,35 @@ const mapPlantState = (state) => {
 };
 
 const formatTime = (v) => v ? new Date(v).toLocaleString() : "--";
+
+const normalizeInverterStatus = (state) => {
+  const normalized = String(state ?? "").toLowerCase();
+  if (normalized === "1" || state === 1 || normalized === "normal" || normalized === "online") return "Normal";
+  if (normalized === "4" || normalized === "5" || state === 4 || state === 5 || normalized === "fault") return "Fault";
+  return "Offline";
+};
+
+const pickField = (row, keys) => {
+  const candidates = [
+    row,
+    row?.attributes,
+    row?.data,
+    row?.info,
+    row?.stats,
+    row?.payload,
+    row?.values,
+    row?.inverter,
+    row?.plant,
+    row?.latest_detail,
+  ];
+  for (const source of candidates) {
+    if (!source) continue;
+    for (const key of keys) {
+      if (source[key] !== undefined && source[key] !== null) return source[key];
+    }
+  }
+  return undefined;
+};
 
 // Placeholder data for errors (keeping as-is since API doesn't provide this)
 const plantDataErrors = {
@@ -717,12 +761,21 @@ export default function PlantDetails() {
 
   // Calculate performance percentage based on acpower and capacity
   const getPercentage = () => {
-    if (!plant) return 0;
-    const acpower = safeNumber(plant.acpower);
-    const capacity = safeNumber(plant.capacity);
-    if (acpower === null || capacity === null || capacity === 0) return 0;
-    return Math.min(100, Math.round((acpower / capacity) * 100));
+    if (!plant || !plant.capacity || !plant.acpower) return 0;
+    const capacity = Number(plant.capacity);
+    const acpower = Number(plant.acpower);
+    if (isNaN(capacity) || isNaN(acpower) || capacity === 0) return 0;
+    const ratio = Math.min(Math.max((acpower / capacity) * 100, 0), 100);
+    return Math.round(ratio);
   };
+
+  useEffect(() => {
+    if (inverters && inverters.length > 0) {
+      // Log a sample inverter for debugging missing fields; remove in production if needed.
+      // eslint-disable-next-line no-console
+      console.debug('Inverter sample', inverters[0]);
+    }
+  }, [inverters]);
 
   // Build production data from API
   const getProductionData = () => {
@@ -972,26 +1025,94 @@ export default function PlantDetails() {
                 <table className="inverter-table-modern">
                   <thead>
                     <tr>
-                      <th>Inverter ID</th>
-                      <th>Collector Address</th>
-                      <th>Plant Name</th>
+                      <th>Keep-live power (kW)</th>
+                      <th>Day Production (kWh)</th>
+                      <th>Total Production (kWh)</th>
+                      <th>Data Time</th>
                       <th>Record Time</th>
+                      <th>Model</th>
+                      <th>Serial</th>
+                      <th>Collector</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {inverters.map((row) => (
-                      <tr
-                        key={row.id}
-                        className="inverter-row"
-                        onClick={() => handleOpenInverter(row)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <td>{row.id ?? "--"}</td>
-                        <td>{row.collector_address ?? "--"}</td>
-                        <td>{row.plant_name ?? plant?.plant_name ?? "--"}</td>
-                        <td>{row.record_time ?? "--"}</td>
-                      </tr>
-                    ))}
+                    {inverters.map((row, idx) => {
+                      const keepLivePower = formatNumberOrText(
+                        pickField(row, [
+                          "acMomentaryPower",
+                          "ac_power",
+                          "acPower",
+                          "acpower",
+                          "acPowerLower",
+                          "acpowerlower",
+                          "ac_power_lower",
+                          "pac",
+                          "ac_power_total",
+                          "acMomentary",
+                        ]),
+                        2
+                      );
+
+                      const dayProduction = formatNumberOrText(
+                        pickField(row, [
+                          "dayPowerLower",
+                          "day_power",
+                          "dayPower",
+                          "eday",
+                          "day_energy",
+                          "dayEnergy",
+                          "eday_power",
+                          "day_total",
+                          "dayPower",
+                        ]),
+                        2
+                      );
+
+                      const totalProduction = formatNumberOrText(
+                        pickField(row, [
+                          "totalPowerLower",
+                          "total_power",
+                          "totalPower",
+                          "etot",
+                          "total_energy",
+                          "totalEnergy",
+                          "total",
+                          "totalPower",
+                        ]),
+                        2
+                      );
+
+                      const dataTime =
+                        pickField(row, ["data_time", "dataTime", "collect_time", "time", "recordDate", "updated_at", "created_at"]) || "--";
+                      const recordTime =
+                        pickField(row, ["record_time", "recordTime", "collect_time", "updated_at", "created_at", "time"]) || "--";
+                      const model =
+                        pickField(row, ["model", "inverter_model", "type", "inverter_model_name", "model_name"]) || "--";
+                      const serial =
+                        pickField(row, ["inverter_sn", "sn", "serial", "collector_sn", "id", "inverter_id", "inverter_no", "inverterNo"]) || "--";
+                      const collector =
+                        pickField(row, ["collector_address", "collector", "collector_sn", "plant_address", "plant_name"]) || "--";
+                      const rowId =
+                        pickField(row, ["id", "inverter_id", "inverter_no", "inverterNo", "sn", "inverter_sn"]) ?? idx;
+
+                      return (
+                        <tr
+                          key={rowId}
+                          className="inverter-row"
+                          onClick={() => handleOpenInverter(row)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <td>{keepLivePower}</td>
+                          <td>{dayProduction}</td>
+                          <td>{totalProduction}</td>
+                          <td>{dataTime ? formatTime(dataTime) : "--"}</td>
+                          <td>{recordTime ? formatTime(recordTime) : "--"}</td>
+                          <td>{model}</td>
+                          <td>{serial}</td>
+                          <td>{collector}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

@@ -267,30 +267,28 @@ export default function InverterSummary({ inverterId, plantNo }) {
   const prodStats = useMemo(() => {
     const inv = basicInfoData || {};
 
-    const keepLivePower = toNumberOrNull(inv.dcCurrent ?? inv.dc_current);
-    const capacity = toNumberOrNull(inv.capacity ?? inv.capacityLower ?? inv.capacity_upper);
-    const dayProduction = toNumberOrNull(inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power);
-    const totalProduction = toNumberOrNull(inv.totalPowerLower ?? inv.total_power_lower ?? inv.totalPower ?? inv.total_power);
-    const kpi = toNumberOrNull(inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.kpi);
-    const workTime = inv.workTime || inv.work_time;
+    const keepLivePower = toNumberOrNull(
+      inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.ac_power ?? inv.acPower
+    );
+    const dayProduction = toNumberOrNull(
+      inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power
+    );
+    const totalProduction = toNumberOrNull(
+      inv.totalPowerLower ?? inv.total_power_lower ?? inv.totalPower ?? inv.total_power
+    );
 
     return [
       { label: 'Keep-live power', value: formatMetric(keepLivePower, 'kW') },
-      { label: 'Capacity', value: formatMetric(capacity, 'kWp') },
       { label: 'Day Production', value: formatMetric(dayProduction, 'kWh') },
       { label: 'Total Production', value: formatMetric(totalProduction, 'kWh') },
-      { label: 'kpi', value: formatMetric(kpi) },
-      { label: 'Work Time', value: workTime || '—' },
     ];
   }, [basicInfoData]);
 
   const wavePercent = useMemo(() => {
     const inv = basicInfoData || {};
-    const kpi = toNumberOrNull(inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.kpi);
     const dayProduction = toNumberOrNull(inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power);
     const totalProduction = toNumberOrNull(inv.totalPowerLower ?? inv.total_power_lower ?? inv.totalPower ?? inv.total_power);
 
-    if (kpi !== null) return Math.max(0, Math.min(100, Math.round(kpi * 100)));
     if (totalProduction && dayProduction !== null) {
       const pct = (dayProduction / totalProduction) * 100;
       return Math.max(0, Math.min(100, Math.round(pct)));
