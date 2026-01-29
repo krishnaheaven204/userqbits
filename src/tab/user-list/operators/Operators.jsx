@@ -262,6 +262,7 @@ export default function InverterTab() {
     }
 
     return currentPageInverters.map((inv, idx) => {
+      const detail = inv?.latest_detail || inv?.latestDetail || {};
       const badge = getStateBadge(
         inv?.plantstate ??
         inv?.plant?.plantstate ??
@@ -270,11 +271,17 @@ export default function InverterTab() {
         inv?.state_text ??
         inv?.status_text
       );
-      const keepLivePower = formatNumber(inv?.acMomentaryPower ?? inv?.ac_power ?? inv?.acPower);
-      const dayProduction = formatNumber(inv?.dayPowerLower ?? inv?.day_power ?? inv?.dayPower);
-      const totalProduction = formatNumber(inv?.totalPowerLower ?? inv?.total_power ?? inv?.totalPower);
-      const dataTime = inv?.data_time || inv?.dataTime || inv?.time;
-      const recordTime = inv?.record_time || inv?.recordTime || inv?.updated_at || inv?.created_at;
+      const keepLivePower = formatNumber(
+        inv?.acMomentaryPower ?? inv?.ac_power ?? inv?.acPower ?? detail?.acMomentaryPower
+      );
+      const dayProduction = formatNumber(
+        inv?.dayPowerLower ?? inv?.day_power ?? inv?.dayPower ?? detail?.dayPowerLower ?? detail?.dayPower
+      );
+      const totalProduction = formatNumber(
+        inv?.totalPowerLower ?? inv?.total_power ?? inv?.totalPower ?? detail?.totalPowerLower ?? detail?.totalPower
+      );
+      const dataTime = inv?.data_time || inv?.dataTime || inv?.time || detail?.recordDate;
+      const recordTime = inv?.record_time || inv?.recordTime || detail?.recordTime || inv?.updated_at || inv?.created_at;
       const model = inv?.model || inv?.inverter_model || inv?.type || 'N/A';
       const serial = inv?.inverter_sn || inv?.sn || inv?.serial || inv?.collector_sn || 'N/A';
       const collector = inv?.collector_address || inv?.collector || inv?.collector_sn || 'N/A';
