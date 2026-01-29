@@ -115,11 +115,28 @@ export default function FaultInfo() {
         }
 
         const metaTotal =
-          data?.data?.faults?.last_page ||
-          data?.faults?.last_page ||
-          data?.data?.last_page ||
-          (Array.isArray(list) && list.length === PAGE_SIZE ? page + 1 : 1);
-        setTotalPages(Math.max(1, Number(metaTotal) || 1));
+          data?.data?.faults?.last_page ??
+          data?.faults?.last_page ??
+          data?.data?.last_page ??
+          data?.last_page ??
+          data?.meta?.last_page ??
+          data?.meta?.lastPage;
+
+        const metaPageCount = Number(metaTotal);
+        const hasMetaCount = Number.isFinite(metaPageCount) && metaPageCount > 0;
+
+        let nextTotalPages;
+        if (list.length < PAGE_SIZE) {
+          // Fewer than a full page means this page is the last one available.
+          nextTotalPages = page;
+        } else if (hasMetaCount) {
+          nextTotalPages = Math.max(page, Math.ceil(metaPageCount));
+        } else {
+          // No meta and full page: assume there could be another page until proven otherwise.
+          nextTotalPages = page + 1;
+        }
+
+        setTotalPages(Math.max(1, nextTotalPages));
       } catch (err) {
         if (err.name === 'AbortError') return;
         setFaults([]);
@@ -132,6 +149,10 @@ export default function FaultInfo() {
     fetchFaults();
     return () => controller.abort();
   }, [activeTab, page, plantId, inverterId]);
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
 
   const sortedFaults = useMemo(() => {
     const toTime = (fault) => {
@@ -207,7 +228,10 @@ export default function FaultInfo() {
                 key={tab.key}
                 type="button"
                 className={`fi-tab ${activeTab === tab.key ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => {
+                  setActiveTab(tab.key);
+                  setPage(1);
+                }}
               >
                 {tab.label}
               </button>

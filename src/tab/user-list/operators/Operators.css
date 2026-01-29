@@ -17,6 +17,22 @@
   margin-bottom: 12px;
 }
 
+.inv-search input {
+  width: 240px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inv-search input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
 .inv-title {
   margin: 0;
   font-size: 18px;
@@ -28,6 +44,82 @@
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   overflow: hidden;
+}
+
+.inv-footer {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.inv-page-info {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.inv-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inv-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.inv-size select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.inv-pager {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inv-pager button {
+  padding: 8px 12px;
+  min-width: 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inv-pager button:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.inv-pager button:disabled {
+  cursor: not-allowed;
+  color: #9ca3af;
+  background: #f3f4f6;
+}
+
+.inv-pager .page-pill {
+  min-width: 36px;
+  text-align: center;
+  color: #ffffff;
+  font-weight: 700;
+  background: #159f6c;
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.25);
 }
 
 .inv-table {

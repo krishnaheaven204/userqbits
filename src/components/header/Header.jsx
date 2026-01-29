@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bars3Icon, UserCircleIcon, Cog6ToothIcon, PowerIcon } from '@heroicons/react/24/outline';
@@ -14,6 +14,7 @@ export default function Header() {
   const [userIdentifier, setUserIdentifier] = useState('');
   const [userRole, setUserRole] = useState('User');
   const [hydrated, setHydrated] = useState(false);
+  const profileRef = useRef(null);
 
   useEffect(() => {
     const name = getCurrentUser() || 'User';
@@ -33,6 +34,29 @@ export default function Header() {
     window.addEventListener('pageChange', handlePageChange);
     return () => window.removeEventListener('pageChange', handlePageChange);    
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!showProfile) return;
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfile(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') setShowProfile(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [showProfile]);
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -67,7 +91,7 @@ export default function Header() {
               )}
 
               {/* User Profile */}
-              <li className="dropdown pc-h-item header-user-profile">
+              <li className="dropdown pc-h-item header-user-profile" ref={profileRef}>
                 <a 
                   className="pc-head-link dropdown-toggle arrow-none me-0" 
                   href="#" 
@@ -96,22 +120,15 @@ export default function Header() {
                           <span className="profile-user-email">{userRole}</span>
                         </div>
                       </div>
-                      <div className="profile-actions">
-                        <a href="#" className="profile-action-item" onClick={() => setShowProfile(false)}>
-                          <UserCircleIcon className="profile-action-icon" />
-                          <span>Edit profile</span>
-                        </a>
-                        <a href="#" className="profile-action-item" onClick={() => setShowProfile(false)}>
-                          <Cog6ToothIcon className="profile-action-icon" style={{width: '20px', height: '20px'}} />
-                          <span>Settings</span>
-                        </a>
+                       
+                         
                         <a href="#" className="profile-action-item" onClick={handleLogout}>
                           <PowerIcon className="profile-action-icon" style={{width: '20px', height: '20px'}} />
                           <span>Logout</span>
                         </a>
                       </div>
                     </div>
-                  </div>
+                   
                 )}
               </li>
             </ul>

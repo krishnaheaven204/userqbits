@@ -286,10 +286,56 @@ export default function StationList() {
     return String(value);
   };
 
+  const getCapacityValue = (item) => {
+    return (
+      item?.capacity ??
+      item?.capacity_lower ??
+      item?.capacityLower ??
+      item?.capacity_upper ??
+      item?.capacityUpper ??
+      item?.power ??
+      item?.kwp ??
+      null
+    );
+  };
+
+  const getDayProductionValue = (item) => {
+    return (
+      item?.day_production ??
+      item?.dayProduction ??
+      item?.day_power ??
+      item?.dayPower ??
+      item?.day_power_lower ??
+      item?.dayPowerLower ??
+      item?.eday ??
+      item?.daily_energy ??
+      item?.dailyEnergy ??
+      null
+    );
+  };
+
+  const getTotalProductionValue = (item) => {
+    return (
+      item?.total_production ??
+      item?.totalProduction ??
+      item?.total_power ??
+      item?.totalPower ??
+      item?.total_power_lower ??
+      item?.totalPowerLower ??
+      item?.etot ??
+      item?.total_energy ??
+      item?.totalEnergy ??
+      null
+    );
+  };
+
   const getPlantTypeLabel = (v) => {
-    if (v === 0) return 'Solar System';
-    if (v === 1) return 'Battery Storage';
-    if (v === 2) return 'Solar with Limitation';
+    const num = Number(v);
+    if (Number.isFinite(num)) {
+      if (num === 0) return 'Solar System';
+      if (num === 1) return 'Battery Storage';
+      if (num === 2) return 'Solar with Limitation';
+    }
     return v ?? 'N/A';
   };
 
@@ -444,9 +490,9 @@ export default function StationList() {
                           <td>{item.latitude || 'N/A'}</td>
                           <td>{item.gmt || item.timezone || 'N/A'}</td>
                           <td>{getPlantTypeLabel(item.plant_type)}</td>
-                          <td>{formatNumber(item.capacity)}</td>
-                          <td>{formatNumber(item.day_production || item.eday)}</td>
-                          <td>{formatNumber(item.total_production || item.etot)}</td>
+                          <td>{formatNumber(getCapacityValue(item))}</td>
+                          <td>{formatNumber(getDayProductionValue(item))}</td>
+                          <td>{formatNumber(getTotalProductionValue(item))}</td>
                           <td>{formatDate(item.created_at)}</td>
                           <td>{formatDate(item.updated_at)}</td>
                         </tr>

@@ -181,6 +181,21 @@ export default function InverterSummary({ inverterId, plantNo }) {
   const [isMetricMenuOpen, setIsMetricMenuOpen] = useState(false);
   const metricDropdownRef = useRef(null);
 
+  const sortAlarmsByTime = (list) => {
+    const safeDate = (value) => {
+      const ts = new Date(value).getTime();
+      return Number.isFinite(ts) ? ts : 0;
+    };
+    return [...list].sort((a, b) => {
+      const aStart = safeDate(a?.stime);
+      const bStart = safeDate(b?.stime);
+      if (bStart !== aStart) return bStart - aStart;
+      const aEnd = safeDate(a?.etime);
+      const bEnd = safeDate(b?.etime);
+      return bEnd - aEnd;
+    });
+  };
+
   const colorPalette = [
     '#e74c3c',
     '#3b82f6',
@@ -413,7 +428,8 @@ export default function InverterSummary({ inverterId, plantNo }) {
             data?.data ||
             data?.faults ||
             [];
-          setAlarms(Array.isArray(alarmData) ? alarmData : []);
+          const normalized = Array.isArray(alarmData) ? alarmData : [];
+          setAlarms(sortAlarmsByTime(normalized));
         } else {
           setAlarms([]);
         }

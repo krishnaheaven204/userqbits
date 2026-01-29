@@ -57,6 +57,9 @@ export default function InverterTab() {
   const [inverters, setInverters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const handleOpenInverter = (inv) => {
     if (!inv) return;
@@ -140,17 +143,90 @@ export default function InverterTab() {
   }, []);
 
   const sortedInverters = useMemo(() => {
-    const toTime = (inv) => {
-      const candidates = [inv?.record_time, inv?.recordTime, inv?.updated_at, inv?.created_at];
-      for (const value of candidates) {
+    const parseFirst = (values) => {
+      for (const value of values) {
         const t = Date.parse(value);
         if (!Number.isNaN(t)) return t;
       }
-      return -Infinity;
+      return undefined;
+    };
+
+    const toTime = (inv) => {
+      const startTime = parseFirst([inv?.start_time, inv?.startTime, inv?.stime, inv?.start]);
+      const endTime = parseFirst([inv?.end_time, inv?.endTime, inv?.etime, inv?.end]);
+      const recordTime = parseFirst([inv?.record_time, inv?.recordTime, inv?.updated_at, inv?.created_at]);
+
+      const primary = Math.max(
+        Number.isFinite(startTime) ? startTime : -Infinity,
+        Number.isFinite(endTime) ? endTime : -Infinity,
+      );
+
+      if (primary > -Infinity) return primary;
+      return Number.isFinite(recordTime) ? recordTime : -Infinity;
     };
 
     return [...inverters].sort((a, b) => toTime(b) - toTime(a));
   }, [inverters]);
+
+  const filteredInverters = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return sortedInverters;
+
+    return sortedInverters.filter((inv) => {
+      const plantName = inv?.plant_name || inv?.plant?.plant_name || '';
+      const idValue =
+        inv?.id ??
+        inv?.inverter_id ??
+        inv?.inverterId ??
+        inv?.inverter_no ??
+        inv?.inverterNo ??
+        inv?.sn ??
+        inv?.inverter_sn ??
+        inv?.inverter?.id ??
+        inv?.inverter?.inverter_id ??
+        inv?.inverter?.inverter_no ??
+        '';
+      const collector = inv?.collector_address || inv?.collector || inv?.collector_sn || '';
+      const badge = getStateBadge(
+        inv?.plantstate ??
+        inv?.plant?.plantstate ??
+        inv?.state ??
+        inv?.status ??
+        inv?.state_text ??
+        inv?.status_text
+      );
+
+      const parts = [plantName, idValue, collector, badge.text];
+      return parts.some((part) => String(part ?? '').toLowerCase().includes(query));
+    });
+  }, [search, sortedInverters]);
+
+  const totalPages = useMemo(() => {
+    const total = Math.ceil(filteredInverters.length / pageSize);
+    return total > 0 ? total : 1;
+  }, [filteredInverters.length, pageSize]);
+
+  const currentPageInverters = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredInverters.slice(start, start + pageSize);
+  }, [filteredInverters, page, pageSize]);
+
+  const startIndex = filteredInverters.length ? (page - 1) * pageSize + 1 : 0;
+  const endIndex = filteredInverters.length
+    ? Math.min(startIndex + pageSize - 1, filteredInverters.length)
+    : 0;
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, pageSize]);
+
+  useEffect(() => {
+    setPage((prev) => Math.min(Math.max(prev, 1), totalPages));
+  }, [totalPages]);
+
+  const goToPage = (target) => {
+    setPage(Math.min(Math.max(target, 1), totalPages));
+  };
 
   const renderBody = () => {
     if (loading) {
@@ -169,15 +245,17 @@ export default function InverterTab() {
       );
     }
 
-    if (!sortedInverters.length) {
+    if (!filteredInverters.length) {
       return (
         <tr>
-          <td colSpan={8} className="inv-center muted">No inverter records found</td>
+          <td colSpan={8} className="inv-center muted">
+            {search.trim() ? 'No matching inverters' : 'No inverter records found'}
+          </td>
         </tr>
       );
     }
 
-    return sortedInverters.map((inv, idx) => {
+    return currentPageInverters.map((inv, idx) => {
       const badge = getStateBadge(
         inv?.plantstate ??
         inv?.plant?.plantstate ??
@@ -222,6 +300,14 @@ export default function InverterTab() {
       <div className="inv-card">
         <div className="inv-header">
           <h5 className="inv-title">Inverters</h5>
+          <div className="inv-search">
+            <input
+              type="text"
+              placeholder="Search by Plant, ID, Collector, or State"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="inv-table-wrap">
@@ -235,11 +321,23 @@ export default function InverterTab() {
                 <th>Record Time</th>
                 <th>Created At</th>
                 <th>Updated At</th>
-                <th>State</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>{renderBody()}</tbody>
           </table>
+        </div>
+
+        <div className="inv-footer">
+          <div className="inv-pager">
+            <button type="button" onClick={() => goToPage(page - 1)} disabled={page <= 1} aria-label="Previous page">
+              ‹
+            </button>
+            <span className="page-pill">{page}</span>
+            <button type="button" onClick={() => goToPage(page + 1)} disabled={page >= totalPages} aria-label="Next page">
+              ›
+            </button>
+          </div>
         </div>
       </div>
     </div>
