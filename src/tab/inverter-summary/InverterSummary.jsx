@@ -270,6 +270,14 @@ export default function InverterSummary({ inverterId, plantNo }) {
     const keepLivePower = toNumberOrNull(
       inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.ac_power ?? inv.acPower
     );
+    const capacity = toNumberOrNull(
+      inv.capacity ??
+      inv.capacityLower ??
+      inv.capacity_upper ??
+      inv.capacity_lower ??
+      inv.cap_power ??
+      inv?.plant?.capacity
+    );
     const dayProduction = toNumberOrNull(
       inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power
     );
@@ -279,6 +287,7 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
     return [
       { label: 'Keep-live power', value: formatMetric(keepLivePower, 'kW') },
+      { label: 'Capacity', value: formatMetric(capacity, 'kWp') },
       { label: 'Day Production', value: formatMetric(dayProduction, 'kWh') },
       { label: 'Total Production', value: formatMetric(totalProduction, 'kWh') },
     ];
@@ -286,11 +295,20 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
   const wavePercent = useMemo(() => {
     const inv = basicInfoData || {};
-    const dayProduction = toNumberOrNull(inv.dayPowerLower ?? inv.day_power_lower ?? inv.dayPower ?? inv.day_power);
-    const totalProduction = toNumberOrNull(inv.totalPowerLower ?? inv.total_power_lower ?? inv.totalPower ?? inv.total_power);
+    const keepLivePower = toNumberOrNull(
+      inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.ac_power ?? inv.acPower
+    );
+    const capacity = toNumberOrNull(
+      inv.capacity ??
+      inv.capacityLower ??
+      inv.capacity_upper ??
+      inv.capacity_lower ??
+      inv.cap_power ??
+      inv?.plant?.capacity
+    );
 
-    if (totalProduction && dayProduction !== null) {
-      const pct = (dayProduction / totalProduction) * 100;
+    if (capacity && keepLivePower !== null && capacity > 0) {
+      const pct = (keepLivePower / capacity) * 100;
       return Math.max(0, Math.min(100, Math.round(pct)));
     }
     return 25;
