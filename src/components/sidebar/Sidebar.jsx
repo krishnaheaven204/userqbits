@@ -57,7 +57,7 @@ export default function Sidebar() {
         </div>
         <div className="navbar-content">
           <ul className="pc-navbar">
-            {/* Dashboard (hidden for now)
+            {/* Dashboard */}
             <li className="pc-item">
               <Link href="/dashboard" className={`pc-link qbits-nav-item ${isActive('dashboard') ? 'active' : ''}`}>
                 <span className="pc-micon">
@@ -66,7 +66,6 @@ export default function Sidebar() {
                 <span className="pc-mtext">Dashboard</span>
               </Link>
             </li>
-            */}
 
             {/* Station List */}
             <li className="pc-item">
