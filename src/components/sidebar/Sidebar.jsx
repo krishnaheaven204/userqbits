@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Bars3Icon,
+  XMarkIcon,
   ChartBarIcon,
   ListBulletIcon,
   ExclamationTriangleIcon,
@@ -19,7 +20,7 @@ import {
 } from '@heroicons/react/24/outline';
 import './Sidebar.css';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen = false, onClose }) {
   const [expandedMenus, setExpandedMenus] = useState({});
   const pathname = usePathname();
 
@@ -38,8 +39,10 @@ export default function Sidebar() {
     return paths.some(path => pathname === `/${path}` || pathname.includes(`/${path}`));
   };
 
+  const sidebarClassName = `pc-sidebar ${isOpen ? 'active' : ''}`;
+
   return (
-    <nav className="pc-sidebar">
+    <nav className={sidebarClassName}>
       <div className="navbar-wrapper">
         <div className="m-header">
           <div className="qbits-logo-container">
@@ -54,6 +57,14 @@ export default function Sidebar() {
               />
             </Link>
           </div>
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            aria-label="Close sidebar"
+            onClick={onClose}
+          >
+            <XMarkIcon style={{ width: '22px', height: '22px' }} />
+          </button>
         </div>
         <div className="navbar-content">
           <ul className="pc-navbar">

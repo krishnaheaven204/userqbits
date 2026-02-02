@@ -12,6 +12,19 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+  /* Remove sticky positioning for first columns on mobile (No., ID, Username) */
+  .custom-table th.sticky-col,
+  .custom-table td.sticky-col,
+  .col-index,
+  .col-id,
+  .col-username {
+    position: static !important;
+    left: auto !important;
+    z-index: 1 !important;
+  }
+}
+
 .ul-header {
   display: flex;
   align-items: center;
@@ -880,7 +893,7 @@ input:checked + .toggle-slider:before {
 .status-box-container {
   display: flex;
   gap: 20px;
-  margin: 25px 0;
+  margin: 5px 0;
   padding: 0 5px;
 }
 

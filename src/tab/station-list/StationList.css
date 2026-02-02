@@ -235,3 +235,44 @@
   padding: 0 4px;
 }
 
+@media (max-width: 768px) {
+  .station-list-page .ul-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .station-list-page .ul-header-text {
+    width: 100%;
+  }
+
+  .station-list-page .ul-search {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .station-list-page .ul-search-input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .station-list-page .status-box-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .station-list-page .status-box-container .status-card {
+    width: 100%;
+  }
+
+  /* Unstick table columns on mobile */
+  .station-list-page .col-index,
+  .station-list-page .col-id,
+  .station-list-page .col-username {
+    position: static;
+    left: auto;
+    z-index: 1;
+  }
+}
+

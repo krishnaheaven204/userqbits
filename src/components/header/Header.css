@@ -40,8 +40,16 @@
 }
 
 @media (max-width: 768px) {
+  .pc-header {
+    left: 0;
+  }
+
   .header-title {
     display: none;
+  }
+
+  .pc-mob-drp {
+    display: block;
   }
 }
 

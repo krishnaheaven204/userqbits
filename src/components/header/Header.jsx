@@ -7,7 +7,7 @@ import { Bars3Icon, UserCircleIcon, Cog6ToothIcon, PowerIcon } from '@heroicons/
 import { logoutViaApi, getCurrentUser, getUserRole } from '@/utils/auth';
 import './Header.css';
 
-export default function Header() {
+export default function Header({ onToggleSidebar }) {
   const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
   const [pageTitle, setPageTitle] = useState('Dashboard');
@@ -72,7 +72,15 @@ export default function Header() {
         <div className="me-auto pc-mob-drp">
           <ul className="list-unstyled">
             <li className="pc-h-item pc-sidebar-collapse">
-              <a href="#" className="pc-head-link ms-0" id="sidebar-hide">      
+              <a
+                href="#"
+                className="pc-head-link ms-0"
+                id="sidebar-hide"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onToggleSidebar?.();
+                }}
+              >      
                 <Bars3Icon style={{width: '20px', height: '20px'}} />
               </a>
             </li>
