@@ -179,7 +179,18 @@ export default function InverterTab() {
     if (!query) return sortedInverters;
 
     return sortedInverters.filter((inv) => {
-      const plantName = inv?.plant_name || inv?.plant?.plant_name || '';
+      const plantName =
+        inv?.plant?.plant_name ??
+        inv?.plant_name ??
+        inv?.plant?.name ??
+        inv?.plant_name_text ??
+        '';
+      const plantNumberOrId =
+        inv?.plant?.plant_no ??
+        inv?.plant_no ??
+        inv?.plant?.id ??
+        inv?.plant_id ??
+        '';
       const idValue =
         inv?.id ??
         inv?.inverter_id ??
@@ -202,7 +213,7 @@ export default function InverterTab() {
         inv?.status_text
       );
 
-      const parts = [plantName, idValue, collector, badge.text];
+      const parts = [plantName, plantNumberOrId, idValue, collector, badge.text];
       return parts.some((part) => String(part ?? '').toLowerCase().includes(query));
     });
   }, [search, sortedInverters]);
@@ -238,7 +249,7 @@ export default function InverterTab() {
     if (loading) {
       return (
         <tr>
-          <td colSpan={8} className="inv-center muted">Loading inverters...</td>
+          <td colSpan={10} className="inv-center muted">Loading inverters...</td>
         </tr>
       );
     }
@@ -246,7 +257,7 @@ export default function InverterTab() {
     if (error) {
       return (
         <tr>
-          <td colSpan={8} className="inv-center error">{error}</td>
+          <td colSpan={10} className="inv-center error">{error}</td>
         </tr>
       );
     }
@@ -254,7 +265,7 @@ export default function InverterTab() {
     if (!filteredInverters.length) {
       return (
         <tr>
-          <td colSpan={8} className="inv-center muted">
+          <td colSpan={10} className="inv-center muted">
             {search.trim() ? 'No matching inverters' : 'No inverter records found'}
           </td>
         </tr>
@@ -263,6 +274,14 @@ export default function InverterTab() {
 
     return currentPageInverters.map((inv, idx) => {
       const detail = inv?.latest_detail || inv?.latestDetail || {};
+      const plantName =
+        inv?.plant?.plant_name ??
+        inv?.plant_name ??
+        inv?.plant?.name ??
+        inv?.plant_name_text ??
+        inv?.plant?.plant_no ??
+        inv?.plant_no ??
+        '';
       const badge = getStateBadge(
         inv?.plantstate ??
         inv?.plant?.plantstate ??
@@ -300,6 +319,7 @@ export default function InverterTab() {
       return (
         <tr key={rowId} onClick={() => handleOpenInverter(inv)} style={{ cursor: 'pointer' }}>
           <td><span className={badge.className}>{badge.text}</span></td>
+          <td>{formatText(plantName)}</td>
           <td>{keepLivePower}</td>
           <td>{dayProduction}</td>
           <td>{totalProduction}</td>
@@ -333,6 +353,7 @@ export default function InverterTab() {
             <thead>
               <tr>
                 <th>Status</th>
+                <th>Plant</th>
                 <th>Keep-live power (kW)</th>
                 <th>Day Production (kWh)</th>
                 <th>Total Production (kWh)</th>
