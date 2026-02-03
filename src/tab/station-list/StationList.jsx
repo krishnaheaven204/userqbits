@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import './StationList.css';
 import '../user-list/all-users/AllUsers.css';
@@ -44,6 +44,7 @@ const SortableHeader = ({ label, field, sortConfig, onSort }) => {
 
 export default function StationList() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('standby');
@@ -184,6 +185,16 @@ export default function StationList() {
   useEffect(() => {
     fetchGroupedClients();
   }, [search]);
+
+  // sync selectedStatus from query param on first render
+  useEffect(() => {
+    const statusParam = searchParams?.get('status');
+    if (!statusParam) return;
+    const validStatuses = ['standby', 'normal', 'warning', 'fault'];
+    if (validStatuses.includes(statusParam)) {
+      setSelectedStatus(statusParam);
+    }
+  }, [searchParams]);
 
   // Debounce search input -> search value
   useEffect(() => {
