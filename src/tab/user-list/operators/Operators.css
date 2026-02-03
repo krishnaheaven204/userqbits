@@ -194,3 +194,73 @@
   background: #e5e7eb;
   color: #374151;
 }
+
+@media (max-width: 768px) {
+  .inverter-page {
+  width: 100%;
+        min-width: 100%;
+        max-width: 80vw;
+
+    padding: 10px 8px;
+  }
+
+  .inv-card {
+    padding: 12px;
+  }
+
+  .inv-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .inv-title {
+    font-size: 16px;
+  }
+
+  .inv-search {
+    width: 100%;
+  }
+
+  .inv-search input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .inv-table-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .inv-table {
+    min-width: 700px;
+  }
+
+  .inv-table thead th,
+  .inv-table tbody td {
+    padding: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .inv-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .inv-pager {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .inv-pager button {
+    flex: 1 1 45%;
+    max-width: 140px;
+  }
+
+  .inv-pager .page-pill {
+    min-width: 48px;
+  }
+}
