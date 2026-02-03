@@ -266,9 +266,15 @@ export default function InverterSummary({ inverterId, plantNo }) {
 
   const prodStats = useMemo(() => {
     const inv = basicInfoData || {};
-
+    
     const keepLivePower = toNumberOrNull(
-      inv.acMomentaryPower ?? inv.ac_momentary_power ?? inv.ac_power ?? inv.acPower
+      inv?.plant?.acpower ??
+      inv?.plant?.ac_power ??
+      inv?.acmomentarypower ??
+      inv?.ac_momentary_power ??
+      inv?.ac_power ??
+      inv?.acPower ??
+      inv?.acpower
     );
     const capacity = toNumberOrNull(
       inv.capacity ??
