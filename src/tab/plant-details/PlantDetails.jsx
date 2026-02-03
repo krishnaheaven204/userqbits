@@ -820,310 +820,312 @@ export default function PlantDetails() {
 
   return (
     <div className="plant-details-page">
-      <div className="page-header">
-        <h1 className="page-title">Plant Details</h1>
-        <div className="plant-breadcrumb-inline">
-          <button className="breadcrumb-item-inline" onClick={() => router.back()}>
-            <span className="breadcrumb-icon">◀</span>
-            <span className="breadcrumb-text">Back</span>
-          </button>
-          <span className="breadcrumb-separator-inline">›</span>
-          <span className="breadcrumb-item-inline active">
-            {loading ? "Loading..." : plant?.plant_name || "Plant"}
-          </span>
-          <span className="breadcrumb-separator-inline">›</span>
-          <span className="breadcrumb-item-inline">{new Date().toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* Top Layout: Two Cards */}
-      <div className="top-cards-layout">
-        {/* Card 1: Production Summary */}
-        <div className="card card-1">
-          <div className="card-header">
-            <h3 className="card-title">Production Summary</h3>
-          </div>
-          <div className="card-content">
-            {error ? (
-              <div style={{ padding: "20px", textAlign: "center" }}>
-                <div style={{ color: "#ef4444", marginBottom: "12px", fontSize: "14px" }}>
-                  {error}
-                </div>
-                <button
-                  onClick={handleRetry}
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#159f6c",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                  }}
-                >
-                  Retry
-                </button>
-              </div>
-            ) : loading ? (
-              <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
-                Loading...
-              </div>
-            ) : (
-              <>
-                <div className="circle-section">
-                  <WaterWaveCircle percentage={getPercentage()} />
-                </div>
-                <div className="stats-grid">
-                  {getProductionData().map((stat, idx) => (
-                    <StatBox key={idx} title={stat.title} value={stat.value} unit={stat.unit} />
-                  ))}
-                </div>
-              </>
-            )}
+      <div className="plant-details-container">
+        <div className="page-header">
+          <h1 className="page-title">Plant Details</h1>
+          <div className="plant-breadcrumb-inline">
+            <button className="breadcrumb-item-inline" onClick={() => router.back()}>
+              <span className="breadcrumb-icon">◀</span>
+              <span className="breadcrumb-text">Back</span>
+            </button>
+            <span className="breadcrumb-separator-inline">›</span>
+            <span className="breadcrumb-item-inline active">
+              {loading ? "Loading..." : plant?.plant_name || "Plant"}
+            </span>
+            <span className="breadcrumb-separator-inline">›</span>
+            <span className="breadcrumb-item-inline">{new Date().toLocaleString()}</span>
           </div>
         </div>
 
-        {/* Card 2: Inverter / Basic Info */}
-        <div className="card card-2">
-          <div className="card-header">
-            <h3 className="card-title">Plant Information</h3>
-          </div>
-          <div className="card-content">
-            {loading ? (
-              <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
-                Loading...
-              </div>
-            ) : (
-              <div className="info-layout">
-                <div className="info-image-box">
-                  <img 
-                    src="https://images.pexels.com/photos/356036/pexels-photo-356036.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop" 
-                    alt="Solar Panel Installation"
-                    className="solar-panel-image"
-                    onError={(e) => {
-                      e.target.src = "https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop";
+        {/* Top Layout: Two Cards */}
+        <div className="top-cards-layout">
+          {/* Card 1: Production Summary */}
+          <div className="card card-1">
+            <div className="card-header">
+              <h3 className="card-title">Production Summary</h3>
+            </div>
+            <div className="card-content">
+              {error ? (
+                <div style={{ padding: "20px", textAlign: "center" }}>
+                  <div style={{ color: "#ef4444", marginBottom: "12px", fontSize: "14px" }}>
+                    {error}
+                  </div>
+                  <button
+                    onClick={handleRetry}
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#159f6c",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "14px",
                     }}
-                  />
+                  >
+                    Retry
+                  </button>
                 </div>
-                <div className="info-text-section">
-                  <div className="info-row">
-                    <span className="info-label">Plant Name</span>
-                    <span className="info-value">{plant?.plant_name || "--"}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">City</span>
-                    <span className="info-value">{plant?.remark1 || "--"}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">Phone/Email</span>
-                    <span className="info-value">{plant?.plant_user || "none"}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">Type of Plant</span>
-                    <span className="info-value">{mapPlantState(plant?.planttype)}</span>
-                  </div>
+              ) : loading ? (
+                <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
+                  Loading...
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Middle Cards Layout: Alarm and Inverter List */}
-      <div className="middle-cards-layout">
-        {/* Error Log Section */}
-        <div className="card error-log-card">
-          <div className="error-log-header">
-            <h3 className="card-title">Alarm</h3>
-            <div className="error-tabs">
-              <button
-                className={`tab-button ${activeTab === "all" ? "active" : ""}`}
-                onClick={() => setActiveTab("all")}
-              >
-                All
-              </button>
-              <button
-                className={`tab-button ${activeTab === "going" ? "active" : ""}`}
-                onClick={() => setActiveTab("going")}
-              >
-                Going
-              </button>
-              <button
-                className={`tab-button ${activeTab === "recovered" ? "active" : ""}`}
-                onClick={() => setActiveTab("recovered")}
-              >
-                Recovered
-              </button>
+              ) : (
+                <>
+                  <div className="circle-section">
+                    <WaterWaveCircle percentage={getPercentage()} />
+                  </div>
+                  <div className="stats-grid">
+                    {getProductionData().map((stat, idx) => (
+                      <StatBox key={idx} title={stat.title} value={stat.value} unit={stat.unit} />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
-          <div className="error-log-content">
-            {loadingAlarms ? (
-              <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
-                Loading...
-              </div>
-            ) : alarms.length > 0 ? (
-              <>
-                {getPaginatedAlarms().map((alarm, idx) => (
-                  <AlarmCard 
-                    key={alarm.id} 
-                    alarm={alarm} 
-                    index={(alarmCurrentPage - 1) * alarmsPerPage + idx + 1} 
-                    tabType={activeTab} 
-                  />
-                ))}
-                {getTotalAlarmPages() > 1 && (
-                  <div className="alarm-pagination-container">
-                    <button 
-                      className="alarm-pagination-arrow"
-                      onClick={() => handleAlarmPageChange(alarmCurrentPage - 1)}
-                      disabled={alarmCurrentPage === 1}
-                    >
-                      ◀
-                    </button>
-                    {Array.from({ length: getTotalAlarmPages() }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        className={`alarm-pagination-number ${alarmCurrentPage === page ? 'active' : ''}`}
-                        onClick={() => handleAlarmPageChange(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                    <button 
-                      className="alarm-pagination-arrow"
-                      onClick={() => handleAlarmPageChange(alarmCurrentPage + 1)}
-                      disabled={alarmCurrentPage === getTotalAlarmPages()}
-                    >
-                      ▶
-                    </button>
+          {/* Card 2: Inverter / Basic Info */}
+          <div className="card card-2">
+            <div className="card-header">
+              <h3 className="card-title">Plant Information</h3>
+            </div>
+            <div className="card-content">
+              {loading ? (
+                <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
+                  Loading...
+                </div>
+              ) : (
+                <div className="info-layout">
+                  <div className="info-image-box">
+                    <img 
+                      src="https://images.pexels.com/photos/356036/pexels-photo-356036.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop" 
+                      alt="Solar Panel Installation"
+                      className="solar-panel-image"
+                      onError={(e) => {
+                        e.target.src = "https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop";
+                      }}
+                    />
                   </div>
-                )}
-              </>
-            ) : (
-              <div className="no-errors">No alarm records</div>
-            )}
+                  <div className="info-text-section">
+                    <div className="info-row">
+                      <span className="info-label">Plant Name</span>
+                      <span className="info-value">{plant?.plant_name || "--"}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">City</span>
+                      <span className="info-value">{plant?.remark1 || "--"}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Phone/Email</span>
+                      <span className="info-value">{plant?.plant_user || "none"}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Type of Plant</span>
+                      <span className="info-value">{mapPlantState(plant?.planttype)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Inverter List Card */}
-        <div className="card inverter-list-card">
-          <div className="inverter-list-header">
-            <h3 className="card-title">Inverter List</h3>
-          </div>
-          <div className="inverter-list-content">
-            {loadingInverters ? (
-              <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
-                Loading...
+        {/* Middle Cards Layout: Alarm and Inverter List */}
+        <div className="middle-cards-layout">
+          {/* Error Log Section */}
+          <div className="card error-log-card">
+            <div className="error-log-header">
+              <h3 className="card-title">Alarm</h3>
+              <div className="error-tabs">
+                <button
+                  className={`tab-button ${activeTab === "all" ? "active" : ""}`}
+                  onClick={() => setActiveTab("all")}
+                >
+                  All
+                </button>
+                <button
+                  className={`tab-button ${activeTab === "going" ? "active" : ""}`}
+                  onClick={() => setActiveTab("going")}
+                >
+                  Going
+                </button>
+                <button
+                  className={`tab-button ${activeTab === "recovered" ? "active" : ""}`}
+                  onClick={() => setActiveTab("recovered")}
+                >
+                  Recovered
+                </button>
               </div>
-            ) : inverters.length === 0 ? (
-              <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
-                No inverter records
-              </div>
-            ) : (
-              <div className="inverter-table-wrapper-modern">
-                <table className="inverter-table-modern">
-                  <thead>
-                    <tr>
-                      <th>Keep-live power (kW)</th>
-                      <th>Day Production (kWh)</th>
-                      <th>Total Production (kWh)</th>
-                      <th>Data Time</th>
-                      <th>Record Time</th>
-                      <th>Model</th>
-                      <th>Serial</th>
-                      <th>Collector</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inverters.map((row, idx) => {
-                      const keepLivePower = formatNumberOrText(
-                        pickField(row, [
-                          "acMomentaryPower",
-                          "ac_power",
-                          "acPower",
-                          "acpower",
-                          "acPowerLower",
-                          "acpowerlower",
-                          "ac_power_lower",
-                          "pac",
-                          "ac_power_total",
-                          "acMomentary",
-                        ]),
-                        2
-                      );
+            </div>
 
-                      const dayProduction = formatNumberOrText(
-                        pickField(row, [
-                          "dayPowerLower",
-                          "day_power",
-                          "dayPower",
-                          "eday",
-                          "day_energy",
-                          "dayEnergy",
-                          "eday_power",
-                          "day_total",
-                          "dayPower",
-                        ]),
-                        2
-                      );
-
-                      const totalProduction = formatNumberOrText(
-                        pickField(row, [
-                          "totalPowerLower",
-                          "total_power",
-                          "totalPower",
-                          "etot",
-                          "total_energy",
-                          "totalEnergy",
-                          "total",
-                          "totalPower",
-                        ]),
-                        2
-                      );
-
-                      const dataTime =
-                        pickField(row, ["data_time", "dataTime", "collect_time", "time", "recordDate", "updated_at", "created_at"]) || "--";
-                      const recordTime =
-                        pickField(row, ["record_time", "recordTime", "collect_time", "updated_at", "created_at", "time"]) || "--";
-                      const model =
-                        pickField(row, ["model", "inverter_model", "type", "inverter_model_name", "model_name"]) || "--";
-                      const serial =
-                        pickField(row, ["inverter_sn", "sn", "serial", "collector_sn", "id", "inverter_id", "inverter_no", "inverterNo"]) || "--";
-                      const collector =
-                        pickField(row, ["collector_address", "collector", "collector_sn", "plant_address", "plant_name"]) || "--";
-                      const rowId =
-                        pickField(row, ["id", "inverter_id", "inverter_no", "inverterNo", "sn", "inverter_sn"]) ?? idx;
-
-                      return (
-                        <tr
-                          key={rowId}
-                          className="inverter-row"
-                          onClick={() => handleOpenInverter(row)}
-                          style={{ cursor: "pointer" }}
+            <div className="error-log-content">
+              {loadingAlarms ? (
+                <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
+                  Loading...
+                </div>
+              ) : alarms.length > 0 ? (
+                <>
+                  {getPaginatedAlarms().map((alarm, idx) => (
+                    <AlarmCard 
+                      key={alarm.id} 
+                      alarm={alarm} 
+                      index={(alarmCurrentPage - 1) * alarmsPerPage + idx + 1} 
+                      tabType={activeTab} 
+                    />
+                  ))}
+                  {getTotalAlarmPages() > 1 && (
+                    <div className="alarm-pagination-container">
+                      <button 
+                        className="alarm-pagination-arrow"
+                        onClick={() => handleAlarmPageChange(alarmCurrentPage - 1)}
+                        disabled={alarmCurrentPage === 1}
+                      >
+                        ◀
+                      </button>
+                      {Array.from({ length: getTotalAlarmPages() }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          className={`alarm-pagination-number ${alarmCurrentPage === page ? 'active' : ''}`}
+                          onClick={() => handleAlarmPageChange(page)}
                         >
-                          <td>{keepLivePower}</td>
-                          <td>{dayProduction}</td>
-                          <td>{totalProduction}</td>
-                          <td>{dataTime ? formatTime(dataTime) : "--"}</td>
-                          <td>{recordTime ? formatTime(recordTime) : "--"}</td>
-                          <td>{model}</td>
-                          <td>{serial}</td>
-                          <td>{collector}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                          {page}
+                        </button>
+                      ))}
+                      <button 
+                        className="alarm-pagination-arrow"
+                        onClick={() => handleAlarmPageChange(alarmCurrentPage + 1)}
+                        disabled={alarmCurrentPage === getTotalAlarmPages()}
+                      >
+                        ▶
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="no-errors">No alarm records</div>
+              )}
+            </div>
+          </div>
+
+          {/* Inverter List Card */}
+          <div className="card inverter-list-card">
+            <div className="inverter-list-header">
+              <h3 className="card-title">Inverter List</h3>
+            </div>
+            <div className="inverter-list-content">
+              {loadingInverters ? (
+                <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
+                  Loading...
+                </div>
+              ) : inverters.length === 0 ? (
+                <div style={{ padding: "20px", textAlign: "center", color: "#9ca3af" }}>
+                  No inverter records
+                </div>
+              ) : (
+                <div className="inverter-table-wrapper-modern">
+                  <table className="inverter-table-modern">
+                    <thead>
+                      <tr>
+                        <th>Keep-live power (kW)</th>
+                        <th>Day Production (kWh)</th>
+                        <th>Total Production (kWh)</th>
+                        <th>Data Time</th>
+                        <th>Record Time</th>
+                        <th>Model</th>
+                        <th>Serial</th>
+                        <th>Collector</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inverters.map((row, idx) => {
+                        const keepLivePower = formatNumberOrText(
+                          pickField(row, [
+                            "acMomentaryPower",
+                            "ac_power",
+                            "acPower",
+                            "acpower",
+                            "acPowerLower",
+                            "acpowerlower",
+                            "ac_power_lower",
+                            "pac",
+                            "ac_power_total",
+                            "acMomentary",
+                          ]),
+                          2
+                        );
+
+                        const dayProduction = formatNumberOrText(
+                          pickField(row, [
+                            "dayPowerLower",
+                            "day_power",
+                            "dayPower",
+                            "eday",
+                            "day_energy",
+                            "dayEnergy",
+                            "eday_power",
+                            "day_total",
+                            "dayPower",
+                          ]),
+                          2
+                        );
+
+                        const totalProduction = formatNumberOrText(
+                          pickField(row, [
+                            "totalPowerLower",
+                            "total_power",
+                            "totalPower",
+                            "etot",
+                            "total_energy",
+                            "totalEnergy",
+                            "total",
+                            "totalPower",
+                          ]),
+                          2
+                        );
+
+                        const dataTime =
+                          pickField(row, ["data_time", "dataTime", "collect_time", "time", "recordDate", "updated_at", "created_at"]) || "--";
+                        const recordTime =
+                          pickField(row, ["record_time", "recordTime", "collect_time", "updated_at", "created_at", "time"]) || "--";
+                        const model =
+                          pickField(row, ["model", "inverter_model", "type", "inverter_model_name", "model_name"]) || "--";
+                        const serial =
+                          pickField(row, ["inverter_sn", "sn", "serial", "collector_sn", "id", "inverter_id", "inverter_no", "inverterNo"]) || "--";
+                        const collector =
+                          pickField(row, ["collector_address", "collector", "collector_sn", "plant_address", "plant_name"]) || "--";
+                        const rowId =
+                          pickField(row, ["id", "inverter_id", "inverter_no", "inverterNo", "sn", "inverter_sn"]) ?? idx;
+
+                        return (
+                          <tr
+                            key={rowId}
+                            className="inverter-row"
+                            onClick={() => handleOpenInverter(row)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <td>{keepLivePower}</td>
+                            <td>{dayProduction}</td>
+                            <td>{totalProduction}</td>
+                            <td>{dataTime ? formatTime(dataTime) : "--"}</td>
+                            <td>{recordTime ? formatTime(recordTime) : "--"}</td>
+                            <td>{model}</td>
+                            <td>{serial}</td>
+                            <td>{collector}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Production Overview Card - Full Width */}
-      <div className="production-overview-section">
-        <ProductionOverview selectedPlant={plant} />
+        {/* Production Overview Card - Full Width */}
+        <div className="production-overview-section">
+          <ProductionOverview selectedPlant={plant} />
+        </div>
       </div>
     </div>
   );

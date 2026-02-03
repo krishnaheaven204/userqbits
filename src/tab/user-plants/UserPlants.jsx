@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getAuthToken } from "@/utils/auth";
 import "./UserPlants.css";
 
@@ -56,22 +56,10 @@ function renderStatusIcon(code) {
 
 export default function UserPlants() {
   const { id } = useParams();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [plants, setPlants] = useState([]);
-  const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Get username from URL query parameter
-  useEffect(() => {
-    const usernameParam = searchParams.get("username");
-    if (usernameParam) {
-      setUserName(decodeURIComponent(usernameParam));
-      // Remove query parameter from URL
-      router.replace(`/user-plants/${id}`, { shallow: true });
-    }
-  }, [searchParams, id, router]);
 
   useEffect(() => {
     const fetchPlants = async () => {
@@ -255,11 +243,6 @@ export default function UserPlants() {
           <div className="up-header-text">
             <h5 className="up-title">Plant List</h5>
           </div>
-          {userName && (
-            <div className="up-user-info">
-              <p className="up-user-name">Username :- <strong>{userName}</strong></p>
-            </div>
-          )}
         </div>
 
         <div className="up-body">

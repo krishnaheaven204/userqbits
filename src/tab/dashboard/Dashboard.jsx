@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import './Dashboard.css';
 
 const MetricIcon = ({ type }) => {
@@ -80,6 +81,7 @@ const MetricIcon = ({ type }) => {
 };
 
 export default function Dashboard() {
+  const router = useRouter();
   const [widgetData, setWidgetData] = useState(null);
   const hasFetched = useRef(false);
 
@@ -112,10 +114,10 @@ export default function Dashboard() {
   }, []);
 
   const statusMetrics = [
-    { label: 'Total Plants', value: widgetData?.all_plant ?? '—', tone: 'mint', icon: 'plants' },
-    { label: 'Normal', value: widgetData?.normal_plant ?? '—', tone: 'indigo', icon: 'normal' },
-    { label: 'Alarm', value: widgetData?.alarm_plant ?? '—', tone: 'amber', icon: 'alarm' },
-    { label: 'Offline', value: widgetData?.offline_plant ?? '—', tone: 'slate', icon: 'offline' },
+    { label: 'Total Plants', value: widgetData?.all_plant ?? '—', tone: 'mint', icon: 'plants', targetStatus: 'standby' },
+    { label: 'Normal', value: widgetData?.normal_plant ?? '—', tone: 'indigo', icon: 'normal', targetStatus: 'normal' },
+    { label: 'Alarm', value: widgetData?.alarm_plant ?? '—', tone: 'amber', icon: 'alarm', targetStatus: 'warning' },
+    { label: 'Offline', value: widgetData?.offline_plant ?? '—', tone: 'slate', icon: 'offline', targetStatus: 'fault' },
   ];
 
   const energyMetrics = [
@@ -142,13 +144,18 @@ export default function Dashboard() {
                 <div className="metric-blocks">
                   <div className="metric-strip">
                     {statusMetrics.map((metric) => (
-                      <div key={metric.label} className={`metric-card tone-${metric.tone}`}>
+                      <button
+                        key={metric.label}
+                        type="button"
+                        className={`metric-card tone-${metric.tone}`}
+                        onClick={() => router.push(`/station-list?status=${metric.targetStatus}`)}
+                      >
                         <div className={`metric-icon-bubble tone-${metric.tone}`}>
                           <MetricIcon type={metric.icon} />
                         </div>
                         <div className="metric-label">{metric.label}</div>
                         <div className="metric-value">{metric.value}</div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>

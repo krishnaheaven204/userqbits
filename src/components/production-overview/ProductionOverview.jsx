@@ -786,108 +786,115 @@ export default function ProductionOverview({ selectedPlant }) {
   };
 
   return (
-    <div className="card" style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', border: '1px solid #e8eef7', overflow: 'hidden' }}>
-      {/* Header with Title, Value, and Controls */}
+    <div
+      className="card production-overview-card"
+      style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', border: '1px solid #e8eef7', overflow: 'hidden' }}
+    >
+      {/* Header with Title and Value */}
       <div style={{ padding: '16px 20px', borderBottom: '1px solid #f0f4f8' }}>
-        <div className="row align-items-center" style={{ margin: 0 }}>
-          <div className="col-auto" style={{ paddingLeft: 0, paddingRight: '8px' }}>
-            <h5 style={{ fontSize: '16px', fontWeight: '600', color: '#475569', margin: 0 }}>Production Overview</h5>
-          </div>
-          <div className="col-auto ms-auto" style={{ paddingRight: 0 }}>
-            <span style={{ fontSize: '16px', fontWeight: '700', color: '#159f6c' }}>
-              {renderTotalValue()}
-            </span>
-          </div>
+        <div className="production-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+          <h5 style={{ fontSize: '16px', fontWeight: '600', color: '#475569', margin: 0 }}>Production Overview</h5>
+          <span className="production-total-value" style={{ fontSize: '16px', fontWeight: '700', color: '#159f6c' }}>
+            {renderTotalValue()}
+          </span>
         </div>
       </div>
 
       {/* Controls Row */}
-      <div style={{ padding: '12px 20px', borderBottom: '1px solid #f0f4f8', backgroundColor: '#fafbfc' }}>
-        <div className="row align-items-center" style={{ margin: 0 }}>
-          <div className="col-auto" style={{ paddingLeft: 0, paddingRight: '6px' }}>
-            <button
-              onClick={() => setActiveTab('day')}
-              style={{
-                padding: '5px 12px',
-                fontSize: '12px',
-                fontWeight: '600',
-                fontFamily: "'Nunito', sans-serif",
-                borderRadius: '4px',
-                backgroundColor: activeTab === 'day' ? '#159f6c' : 'transparent',
-                color: activeTab === 'day' ? '#fff' : '#6b7280',
-                border: activeTab === 'day' ? 'none' : '1px solid #d1d5db',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Day
-            </button>
-          </div>
-          <div className="col-auto" style={{ paddingLeft: '3px', paddingRight: '3px' }}>
-            <button
-              onClick={() => setActiveTab('month')}
-              style={{
-                padding: '5px 12px',
-                fontSize: '12px',
-                fontWeight: '600',
-                fontFamily: "'Nunito', sans-serif",
-                borderRadius: '4px',
-                backgroundColor: activeTab === 'month' ? '#159f6c' : 'transparent',
-                color: activeTab === 'month' ? '#fff' : '#6b7280',
-                border: activeTab === 'month' ? 'none' : '1px solid #d1d5db',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Month
-            </button>
-          </div>
-          <div className="col-auto" style={{ paddingLeft: '3px', paddingRight: '3px' }}>
-            <button
-              onClick={() => setActiveTab('year')}
-              style={{
-                padding: '5px 12px',
-                fontSize: '12px',
-                fontWeight: '600',
-                fontFamily: "'Nunito', sans-serif",
-                borderRadius: '4px',
-                backgroundColor: activeTab === 'year' ? '#159f6c' : 'transparent',
-                color: activeTab === 'year' ? '#fff' : '#6b7280',
-                border: activeTab === 'year' ? 'none' : '1px solid #d1d5db',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Year
-            </button>
-          </div>
-          <div className="col-auto" style={{ paddingLeft: '3px', paddingRight: '6px' }}>
-            <button
-              onClick={() => {
-                setActiveTab('total');
-              }}
-              style={{
-                padding: '5px 12px',
-                fontSize: '12px',
-                fontWeight: '600',
-                fontFamily: "'Nunito', sans-serif",
-                borderRadius: '4px',
-                backgroundColor: activeTab === 'total' ? '#159f6c' : 'transparent',
-                color: activeTab === 'total' ? '#fff' : '#6b7280',
-                border: activeTab === 'total' ? 'none' : '1px solid #d1d5db',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Total
-            </button>
-          </div>
-          {activeTab === 'day' && (
-            <div className="col-auto ms-auto" style={{ paddingRight: 0 }}>
-              <DatePicker value={selectedDate} onChange={setSelectedDate} />
-            </div>
-          )}
+      <div
+        className="production-controls"
+        style={{
+          padding: '12px 20px',
+          borderBottom: '1px solid #f0f4f8',
+          backgroundColor: '#fafbfc',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div className="production-tab-buttons" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          <button
+            className="production-tab-button"
+            onClick={() => setActiveTab('day')}
+            style={{
+              padding: '5px 12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              fontFamily: "'Nunito', sans-serif",
+              borderRadius: '4px',
+              backgroundColor: activeTab === 'day' ? '#159f6c' : 'transparent',
+              color: activeTab === 'day' ? '#fff' : '#6b7280',
+              border: activeTab === 'day' ? 'none' : '1px solid #d1d5db',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Day
+          </button>
+          <button
+            className="production-tab-button"
+            onClick={() => setActiveTab('month')}
+            style={{
+              padding: '5px 12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              fontFamily: "'Nunito', sans-serif",
+              borderRadius: '4px',
+              backgroundColor: activeTab === 'month' ? '#159f6c' : 'transparent',
+              color: activeTab === 'month' ? '#fff' : '#6b7280',
+              border: activeTab === 'month' ? 'none' : '1px solid #d1d5db',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Month
+          </button>
+          <button
+            className="production-tab-button"
+            onClick={() => setActiveTab('year')}
+            style={{
+              padding: '5px 12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              fontFamily: "'Nunito', sans-serif",
+              borderRadius: '4px',
+              backgroundColor: activeTab === 'year' ? '#159f6c' : 'transparent',
+              color: activeTab === 'year' ? '#fff' : '#6b7280',
+              border: activeTab === 'year' ? 'none' : '1px solid #d1d5db',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Year
+          </button>
+          <button
+            className="production-tab-button"
+            onClick={() => {
+              setActiveTab('total');
+            }}
+            style={{
+              padding: '5px 12px',
+              fontSize: '12px',
+              fontWeight: '600',
+              fontFamily: "'Nunito', sans-serif",
+              borderRadius: '4px',
+              backgroundColor: activeTab === 'total' ? '#159f6c' : 'transparent',
+              color: activeTab === 'total' ? '#fff' : '#6b7280',
+              border: activeTab === 'total' ? 'none' : '1px solid #d1d5db',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Total
+          </button>
         </div>
+        {activeTab === 'day' && (
+          <div className="production-date-picker" style={{ marginLeft: 'auto' }}>
+            <DatePicker value={selectedDate} onChange={setSelectedDate} />
+          </div>
+        )}
       </div>
 
       {/* Chart Container */}
