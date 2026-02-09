@@ -75,6 +75,116 @@
   font-size: 14px;
 }
 
+.fi-th-with-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
+}
+
+.fi-filter-btn {
+  height: 30px;
+  width: 34px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fi-filter-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.fi-filter-btn:hover {
+  border-color: #159f6c;
+  color: #159f6c;
+  box-shadow: 0 2px 8px rgba(21, 159, 108, 0.12);
+}
+
+.fi-filter-btn.active {
+  border-color: #159f6c;
+  color: #159f6c;
+  background: #e7f7f1;
+}
+
+.fi-filter-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  padding: 10px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.fi-filter-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0;
+  width: 100%;
+}
+
+.fi-filter-clear,
+.fi-filter-done {
+  height: 30px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 92px;
+}
+
+.fi-filter-clear:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.fi-filter-done {
+  border-color: #159f6c;
+  background: #159f6c;
+  color: #ffffff;
+}
+
+.fi-filter-input {
+  height: 30px;
+  width: 180px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+}
+
+.fi-filter-input:focus {
+  border-color: #159f6c;
+  box-shadow: 0 0 0 3px rgba(21, 159, 108, 0.14);
+}
+
 .fi-table tbody td {
   padding: 10px 12px;
   border-bottom: 1px solid #eaeef2;
@@ -215,6 +325,20 @@
     padding: 8px;
     font-size: 13px;
     white-space: nowrap;
+  }
+
+  .fi-th-with-filter {
+    gap: 8px;
+  }
+
+  .fi-filter-popover {
+    right: auto;
+    left: 0;
+    width: 220px;
+  }
+
+  .fi-filter-input {
+    width: 140px;
   }
 
   .fi-table {
