@@ -69,6 +69,9 @@ export default function InverterTab() {
   const [statusQuery, setStatusQuery] = useState('');
   const [statusFilterOpen, setStatusFilterOpen] = useState(false);
   const statusFilterRef = useRef(null);
+  const [plantQuery, setPlantQuery] = useState('');
+  const [plantFilterOpen, setPlantFilterOpen] = useState(false);
+  const plantFilterRef = useRef(null);
 
   const statusOptions = useMemo(
     () => [
@@ -96,6 +99,23 @@ export default function InverterTab() {
       document.removeEventListener('touchstart', handlePointerDown);
     };
   }, [statusFilterOpen]);
+
+  useEffect(() => {
+    if (!plantFilterOpen) return;
+    const handlePointerDown = (event) => {
+      const root = plantFilterRef.current;
+      if (!root) return;
+      if (root.contains(event.target)) return;
+      setPlantFilterOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [plantFilterOpen]);
 
   const handleOpenInverter = (inv) => {
     if (!inv) return;
@@ -207,9 +227,11 @@ export default function InverterTab() {
   const filteredInverters = useMemo(() => {
     const query = search.trim().toLowerCase();
     const statusQ = statusQuery.trim().toLowerCase();
+    const plantQ = plantQuery.trim().toLowerCase();
     const hasSearch = Boolean(query);
     const hasStatus = Boolean(statusQ);
-    if (!hasSearch && !hasStatus) return sortedInverters;
+    const hasPlant = Boolean(plantQ);
+    if (!hasSearch && !hasStatus && !hasPlant) return sortedInverters;
 
     return sortedInverters.filter((inv) => {
       const plantName =
@@ -246,6 +268,9 @@ export default function InverterTab() {
         inv?.status_text
       );
 
+      const plantMatch = !hasPlant || String(plantName ?? '').toLowerCase().includes(plantQ);
+      if (!plantMatch) return false;
+
       const statusMatch = !hasStatus || String(badge.text ?? '').toLowerCase().includes(statusQ);
       if (!statusMatch) return false;
 
@@ -254,7 +279,7 @@ export default function InverterTab() {
       const parts = [plantName, plantNumberOrId, idValue, collector, badge.text];
       return parts.some((part) => String(part ?? '').toLowerCase().includes(query));
     });
-  }, [search, statusQuery, sortedInverters]);
+  }, [search, statusQuery, plantQuery, sortedInverters]);
 
   const totalPages = useMemo(() => {
     const total = Math.ceil(filteredInverters.length / pageSize);
@@ -273,7 +298,7 @@ export default function InverterTab() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusQuery, pageSize]);
+  }, [search, statusQuery, plantQuery, pageSize]);
 
   useEffect(() => {
     setPage((prev) => Math.min(Math.max(prev, 1), totalPages));
@@ -426,7 +451,49 @@ export default function InverterTab() {
                     )}
                   </div>
                 </th>
-                <th>Plant</th>
+                <th>
+                  <div className="inv-th-with-filter" ref={plantFilterRef}>
+                    <span>Plant</span>
+                    <button
+                      type="button"
+                      className={`inv-filter-btn ${plantQuery ? 'active' : ''}`}
+                      onClick={() => setPlantFilterOpen((v) => !v)}
+                      aria-label="Plant filter"
+                      title="Filter"
+                    >
+                      <span className="inv-filter-icon" aria-hidden="true">
+                        ☰
+                      </span>
+                    </button>
+                    {plantFilterOpen && (
+                      <div className="inv-filter-popover" role="dialog" aria-label="Plant filter">
+                        <input
+                          className="inv-filter-input"
+                          value={plantQuery}
+                          onChange={(e) => setPlantQuery(e.target.value)}
+                          placeholder="Search plant"
+                        />
+                        <div className="inv-filter-actions">
+                          <button
+                            type="button"
+                            className="inv-filter-clear"
+                            onClick={() => setPlantQuery('')}
+                            disabled={!plantQuery}
+                          >
+                            Clear
+                          </button>
+                          <button
+                            type="button"
+                            className="inv-filter-done"
+                            onClick={() => setPlantFilterOpen(false)}
+                          >
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </th>
                 <th>Keep-live power (kW)</th>
                 <th>Day Production (kWh)</th>
                 <th>Total Production (kWh)</th>
