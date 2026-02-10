@@ -203,6 +203,7 @@
   top: calc(100% + 8px);
   right: 0;
   width: 240px;
+  max-width: calc(100vw - 32px);
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
