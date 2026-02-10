@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './FaultInfo.css';
 
 const API_URL = 'https://qbits.quickestimate.co/api/v1/frontend/faults';
@@ -76,9 +76,29 @@ export default function FaultInfo() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [stationQuery, setStationQuery] = useState('');
+  const [stationFilterOpen, setStationFilterOpen] = useState(false);
+  const stationFilterRef = useRef(null);
   // Optional filters if needed later
   const [plantId] = useState('');
   const [inverterId] = useState('');
+
+  useEffect(() => {
+    if (!stationFilterOpen) return;
+    const handlePointerDown = (event) => {
+      const root = stationFilterRef.current;
+      if (!root) return;
+      if (root.contains(event.target)) return;
+      setStationFilterOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [stationFilterOpen]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -168,6 +188,19 @@ export default function FaultInfo() {
     return [...faults].sort((a, b) => toTime(b) - toTime(a));
   }, [faults]);
 
+  const filteredFaults = useMemo(() => {
+    const q = stationQuery.trim().toLowerCase();
+    if (!q) return sortedFaults;
+    return sortedFaults.filter((fault) => {
+      const stationName =
+        fault?.inverter?.plant?.plant_name ||
+        fault?.plant?.plant_name ||
+        fault?.plant_name ||
+        '';
+      return String(stationName).toLowerCase().includes(q);
+    });
+  }, [sortedFaults, stationQuery]);
+
   const renderBody = () => {
     if (loading) {
       return (
@@ -185,7 +218,7 @@ export default function FaultInfo() {
       );
     }
 
-    if (!sortedFaults.length) {
+    if (!filteredFaults.length) {
       return (
         <tr>
           <td colSpan={7} className="fi-center muted">No fault records found</td>
@@ -193,7 +226,7 @@ export default function FaultInfo() {
       );
     }
 
-    return sortedFaults.map((fault, idx) => {
+    return filteredFaults.map((fault, idx) => {
       const badge = statusBadge(fault.status);
       const stationName = fault?.inverter?.plant?.plant_name || fault?.plant?.plant_name || fault?.plant_name;
       const device = fault?.inverter?.model || fault?.model;
@@ -244,7 +277,49 @@ export default function FaultInfo() {
             <thead>
               <tr>
                 <th>Status</th>
-                <th>Station Name</th>
+                <th>
+                  <div className="fi-th-with-filter" ref={stationFilterRef}>
+                    <span>Station Name</span>
+                    <button
+                      type="button"
+                      className={`fi-filter-btn ${stationQuery ? 'active' : ''}`}
+                      onClick={() => setStationFilterOpen((v) => !v)}
+                      aria-label="Station name filter"
+                      title="Filter"
+                    >
+                      <span className="fi-filter-icon" aria-hidden="true">
+                        ≡
+                      </span>
+                    </button>
+                    {stationFilterOpen && (
+                      <div className="fi-filter-popover" role="dialog" aria-label="Station name filter">
+                        <input
+                          className="fi-filter-input"
+                          value={stationQuery}
+                          onChange={(e) => setStationQuery(e.target.value)}
+                          placeholder="Search station"
+                        />
+                        <div className="fi-filter-actions">
+                          <button
+                            type="button"
+                            className="fi-filter-clear"
+                            onClick={() => setStationQuery('')}
+                            disabled={!stationQuery}
+                          >
+                            Clear
+                          </button>
+                          <button
+                            type="button"
+                            className="fi-filter-done"
+                            onClick={() => setStationFilterOpen(false)}
+                          >
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </th>
                 <th>Device</th>
                 <th>Serial</th>
                 <th>Fault Info</th>

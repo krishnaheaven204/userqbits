@@ -276,6 +276,8 @@ export default function InverterSummary({ inverterId, plantNo }) {
       inv?.acPower ??
       inv?.acpower
     );
+
+    
     const capacity = toNumberOrNull(
       inv.capacity ??
       inv.capacityLower ??

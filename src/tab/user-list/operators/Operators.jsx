@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import './Operators.css';
 
@@ -66,6 +66,36 @@ export default function InverterTab() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [statusQuery, setStatusQuery] = useState('');
+  const [statusFilterOpen, setStatusFilterOpen] = useState(false);
+  const statusFilterRef = useRef(null);
+
+  const statusOptions = useMemo(
+    () => [
+      { label: 'Show All', value: '' },
+      { label: 'Normal', value: 'normal' },
+      { label: 'Fault', value: 'fault' },
+      { label: 'Offline', value: 'offline' },
+    ],
+    []
+  );
+
+  useEffect(() => {
+    if (!statusFilterOpen) return;
+    const handlePointerDown = (event) => {
+      const root = statusFilterRef.current;
+      if (!root) return;
+      if (root.contains(event.target)) return;
+      setStatusFilterOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [statusFilterOpen]);
 
   const handleOpenInverter = (inv) => {
     if (!inv) return;
@@ -176,7 +206,10 @@ export default function InverterTab() {
 
   const filteredInverters = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return sortedInverters;
+    const statusQ = statusQuery.trim().toLowerCase();
+    const hasSearch = Boolean(query);
+    const hasStatus = Boolean(statusQ);
+    if (!hasSearch && !hasStatus) return sortedInverters;
 
     return sortedInverters.filter((inv) => {
       const plantName =
@@ -213,10 +246,15 @@ export default function InverterTab() {
         inv?.status_text
       );
 
+      const statusMatch = !hasStatus || String(badge.text ?? '').toLowerCase().includes(statusQ);
+      if (!statusMatch) return false;
+
+      if (!hasSearch) return true;
+
       const parts = [plantName, plantNumberOrId, idValue, collector, badge.text];
       return parts.some((part) => String(part ?? '').toLowerCase().includes(query));
     });
-  }, [search, sortedInverters]);
+  }, [search, statusQuery, sortedInverters]);
 
   const totalPages = useMemo(() => {
     const total = Math.ceil(filteredInverters.length / pageSize);
@@ -235,7 +273,7 @@ export default function InverterTab() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, statusQuery, pageSize]);
 
   useEffect(() => {
     setPage((prev) => Math.min(Math.max(prev, 1), totalPages));
@@ -352,7 +390,42 @@ export default function InverterTab() {
           <table className="inv-table">
             <thead>
               <tr>
-                <th>Status</th>
+                <th>
+                  <div className="inv-th-with-filter" ref={statusFilterRef}>
+                    <span>Status</span>
+                    <button
+                      type="button"
+                      className={`inv-filter-btn ${statusQuery ? 'active' : ''}`}
+                      onClick={() => setStatusFilterOpen((v) => !v)}
+                      aria-label="Status filter"
+                      title="Filter"
+                    >
+                      <span className="inv-filter-icon" aria-hidden="true">
+                        ☰
+                      </span>
+                    </button>
+                    {statusFilterOpen && (
+                      <div className="inv-filter-menu" role="dialog" aria-label="Status filter">
+                        <div className="inv-filter-menu-title">STATUS</div>
+                        <div className="inv-filter-menu-items">
+                          {statusOptions.map((opt) => (
+                            <button
+                              key={opt.label}
+                              type="button"
+                              className={`inv-filter-menu-item ${statusQuery === opt.value ? 'active' : ''}`}
+                              onClick={() => {
+                                setStatusQuery(opt.value);
+                                setStatusFilterOpen(false);
+                              }}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </th>
                 <th>Plant</th>
                 <th>Keep-live power (kW)</th>
                 <th>Day Production (kWh)</th>
